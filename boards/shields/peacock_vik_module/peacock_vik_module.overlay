@@ -11,7 +11,8 @@
 		compatible = "microchip,maxtouch";
 		reg = <0x4a>;
 		chg-gpios = <&vik_conn 3 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-
+		sensor-width = <156>;
+		sensor-height= <91>;
 		swap-xy;
 		repeat-each-cycle;
 	};
@@ -20,9 +21,7 @@
 / {
 	trackpad_listener {
 		compatible = "zmk,input-listener";
-
 		mode = "trackpad";
-
 		device = <&trackpad>;
 	};
 };

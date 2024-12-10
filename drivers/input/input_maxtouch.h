@@ -16,10 +16,19 @@ struct mxt_data {
     uint16_t t6_command_processor_address;
     uint16_t t7_powerconfig_address;
     uint16_t t8_acquisitionconfig_address;
+    uint16_t t25_self_test_address;
+    uint16_t t37_diagnostic_debug_address;
+    uint16_t t42_proci_touchsupression_address;
     uint16_t t44_message_count_address;
     uint16_t t46_cte_config_address;
+    uint16_t t47_proci_stylus_address;
+    uint16_t t56_proci_shieldless_address;
+    uint16_t t65_proci_lensbending_address;
+    uint16_t t80_proci_retransmissioncompensation_address;
     uint16_t t100_multiple_touch_touchscreen_address;
 
+    uint16_t t6_command_processor_report_id;
+    uint16_t t25_self_test_report_id;
     uint16_t t100_first_report_id;
 };
 
@@ -34,13 +43,21 @@ struct mxt_config {
     const bool invert_x;
     const bool invert_y;
     const bool repeat_each_cycle;
+    const uint16_t sensor_width;
+    const uint16_t sensor_height;
+    const uint8_t touch_threshold;
+    const uint8_t touch_hysteresis;
+    const uint8_t internal_touch_threshold;
+    const uint8_t internal_touch_hysteresis;
+    const uint8_t gain;
+    const uint8_t charge_time;
+    const uint8_t allowed_measurement_types;
+    const uint8_t active_syncs_per_x;
+    const uint8_t idle_syncs_per_x;
+    const bool retransmission_compensation_disable;
 };
 
 #define MXT_REG_INFORMATION_BLOCK (0)
-
-// These are peacock specific, they are used for handling CPI calculations.
-#define MXT_SENSOR_WIDTH_MM 156
-#define MXT_SENSOR_HEIGHT_MM 91
 
 struct mxt_object_table_element {
     uint8_t type;
@@ -62,7 +79,7 @@ struct mxt_information_block {
 
 struct mxt_message {
     uint8_t report_id;
-    uint8_t data[5];
+    uint8_t data[6];
 } __packed;
 
 struct mxt_message_count {
@@ -85,6 +102,24 @@ struct mxt_gen_commandprocessor_t6 {
     uint8_t diagnostic;
     uint8_t debugctrl2;
 } __packed;
+
+#define MXT_T6_DIAGNOSTIC_PAGE_UP                               0x01
+#define MXT_T6_DIAGNOSTIC_PAGE_DOWN                             0x02
+#define MXT_T6_DIAGNOSTIC_MUTUAL_CAPACITANCE_DELTA_MODE         0x10
+#define MXT_T6_DIAGNOSTIC_MUTUAL_CAPACITANCE_REFERENCE_MODE     0x11
+#define MXT_T6_DIAGNOSTIC_MUTUAL_CAPACITANCE_DC_DATA_MODE       0x38
+#define MXT_T6_DIAGNOSTIC_DEVICE_INFORMATION_MODE               0x80
+#define MXT_T6_DIAGNOSTIC_SELF_CAPACITANCE_SIGNAL_MODE          0xF5
+#define MXT_T6_DIAGNOSTIC_SELF_CAPACITANCE_DELTA_MODE           0xF7
+#define MXT_T6_DIAGNOSTIC_SELF_CAPACITANCE_REFERENCE_MODE       0xF8
+#define MXT_T6_DIAGNOSTIC_KEY_DELTA_MODE                        0x17
+#define MXT_T6_DIAGNOSTIC_KEY_REFERENCE_MODE                    0x18
+#define MXT_T6_DIAGNOSTIC_KEY_SIGNAL_MODE                       0x19
+#define MXT_T6_DIAGNOSTIC_CALIBRATION_RECOVERY_TUNING_DATA_MODE 0x33
+#define MXT_T6_DIAGNOSTIC_PIN_FAULT_SELF_TEST_MODE              0x35
+#define MXT_T6_DIAGNOSTIC_TOUCH_STATUS_DATA_MODE                0x36
+#define MXT_T6_DIAGNOSTIC_PRODUCT_DATA_STORE_MODE               0x81
+#define MXT_T6_DIAGNOSTIC_TOUCHSCREEN_MODE                      0xF4
 
 struct mxt_gen_powerconfig_t7 {
     uint8_t idleacqint;
@@ -110,14 +145,68 @@ struct mxt_gen_acquisitionconfig_t8 {
     uint8_t driftst;
     uint8_t tchautocal;
     uint8_t sync;
-    uint8_t acthcalst;
-    uint8_t acthcalsthr;
+    uint8_t atchcalst;
+    uint8_t atchcalsthr;
     uint8_t atchfrccalthr;
     uint8_t atchfrccalratio;
     uint8_t measallow;
     uint8_t reserved2[3];
     uint8_t cfg;
 } __packed;
+
+struct mxt_spt_selftest_t25 {
+    uint8_t ctrl;
+    uint8_t cmd;
+    uint8_t upsiglim_lsb;
+    uint8_t upsiglim_msb;
+    uint8_t losiglim_lsb;
+    uint8_t losiglim_msb;
+    uint8_t pindwellus;
+    uint8_t sigrangelim_lsb;
+    uint8_t sigrangelim_msb;
+    uint8_t pinthr;
+    uint8_t pertstinterval;
+    uint8_t pertstholdoff;
+    uint8_t pertstrptfactor;
+    uint8_t pertstrtpwidth;
+    uint8_t pertstcfg;
+    uint8_t sesiglimits[3];
+} __packed;
+
+#define MXT_T25_TEST_FINISHED       0x00
+#define MXT_T25_TEST_POWER          0x01
+#define MXT_T25_TEST_PIN_FAULT      0x12
+#define MXT_T25_TEST_SIGNAL_LIMIT   0x17
+#define MXT_T25_TEST_ALL            0xFE
+#define MXT_T25_TEST_INVALID        0xFD
+#define MXT_T25_TEST_PASSED         0xFE
+
+struct mxt_proci_touchsupression_t42 {
+    uint8_t ctrl;
+    uint8_t reserved;
+    uint8_t maxapprarea;
+    uint8_t maxtcharea;
+    uint8_t supstrength;
+    uint8_t supextto;
+    uint8_t maxnumtchs;
+    uint8_t shapestrength;
+    uint8_t supdist;
+    uint8_t disthyst;
+    uint8_t maxscrnarea;
+    uint8_t cfg;
+    uint8_t reserved2;
+    uint8_t edgesupstrength;
+} __packed;
+
+#define MXT_T42_CTRL_ENABLE         0x01
+#define MXT_T42_CTRL_SHAPEEN        0x04
+#define MXT_T42_CTRL_DISLOBJ        0x08
+#define MXT_T42_CTRL_DISTLOCK       0x10
+#define MXT_T42_CTRL_SUPDISTEN      0x20
+#define MXT_T42_CTRL_EDGESUP        0x40
+#define MXT_T42_CFG_RELAXCLOSEUP    0x01
+#define MXT_T42_CFG_RELAXDIAGSUP    0x02
+#define MXT_T42_CFG_SUPTCHRPTEN     0x04
 
 struct mxt_spt_cteconfig_t46 {
     uint8_t reserved[2];
@@ -132,6 +221,118 @@ struct mxt_spt_cteconfig_t46 {
     uint8_t inrushcfg;
     uint8_t reserved3[6];
     uint8_t cfg;
+} __packed;
+
+
+#define MXT_T46_CFG_SYNCLOSSMODE 0x02
+#define MXT_T46_CFG_DELTASHIFT   0x04
+
+struct mxt_proci_stylus_t47 {
+    uint8_t ctrl;
+    uint8_t reserved;
+    uint8_t contmax;
+    uint8_t stability;
+    uint8_t maxtcharea;
+    uint8_t amplthr;
+    uint8_t styshape;
+    uint8_t hoversup;
+    uint8_t confthr;
+    uint8_t syncsperx;
+    uint8_t xposadj;
+    uint8_t yposadj;
+    uint8_t cfg;
+    uint8_t reserved2[7];
+    uint8_t supstyto;
+    uint8_t maxnumsty;
+    uint8_t xedgectrl;
+    uint8_t xedgedist;
+    uint8_t yedgectrl;
+    uint8_t yedgedist;
+    uint8_t supto;
+    uint8_t supclassmode;
+    uint8_t dxxedgectrl;
+    uint8_t dxxedgedist;
+    uint8_t xedgectrlhi;
+    uint8_t xedgedisthi;
+    uint8_t dxxedgectrlhi;
+    uint8_t dxxedgedisthi;
+    uint8_t yedgectrlhi;
+    uint8_t yedgedisthi;
+    uint8_t cfg2;
+    uint8_t movfilter;
+    uint8_t movsmooth;
+    uint8_t movpred;
+    uint8_t satbxlo;
+    uint8_t satbxhi;
+    uint8_t satbylo;
+    uint8_t satbyhi;
+    uint8_t satbdxxlo;
+    uint8_t satbdxxhi;
+    uint8_t movhistcfg;
+} __packed;
+
+#define MXT_T47_CFG_SUPSTY  0x20
+
+struct mxt_proci_shieldless_t56 {
+    uint8_t ctrl;
+    uint8_t reserved;
+    uint8_t optint;
+    uint8_t inttime;
+    uint8_t intdelay[41];
+} __packed;
+
+#define MXT_T56_CTRL_ENABLE 0x01
+#define MXT_T56_CTRL_RPTEN  0x02
+
+struct mxt_proci_lensbending_t65 {
+    uint8_t ctrl;
+    uint8_t gradthr;
+    uint8_t ylonoisemul_lsb;
+    uint8_t ylonoisemul_msb;
+    uint8_t ylonoisediv_lsb;
+    uint8_t ylonoisediv_msb;
+    uint8_t yhinoisemul_lsb;
+    uint8_t yhinoisemul_msb;
+    uint8_t yhinoisediv_lsb;
+    uint8_t yhinoisediv_msb;
+    uint8_t lpfiltcoef;
+    uint8_t forcescale_lsb;
+    uint8_t forcescale_msb;
+    uint8_t forcethr;
+    uint8_t forcethrhyst;
+    uint8_t forcedi;
+    uint8_t forcehyst;
+    uint8_t atchratio;
+    uint8_t reserved[2];
+    uint8_t exfrcthr;
+    uint8_t exfrcthrhyst;
+    uint8_t exfrcto;
+} __packed;
+
+#define MXT_T65_CTRL_ENABLE             0x01
+#define MXT_T65_CTRL_RPTEN              0x02
+#define MXT_T65_CTRL_DISPRESS           0x08
+#define MXT_T65_CTRL_DISRELEASE         0x10
+#define MXT_T65_CTRL_DISHIST            0x80
+#define MXT_T65_ATCHRATIO_ATCHRATIO     0x01
+#define MXT_T65_ATCHRATIO_DSRATIO       0x10
+
+struct mxt_proci_retransmissioncompensation_t80 {
+    uint8_t ctrl;
+    uint8_t compgain;
+    uint8_t targetdelta;
+    uint8_t compthr;
+    uint8_t atchthr;
+    uint8_t moistcfg;
+    uint8_t reserved;
+    uint8_t moistthr;
+    uint8_t moistinvtchthr;
+    uint8_t moistcfg2;
+    uint8_t compstrthr;
+    uint8_t compcfg;
+    uint8_t moistvldthrsf;
+    uint8_t moistcfg3;
+    unsigned char moistdegthr;
 } __packed;
 
 struct mxt_touch_multiscreen_t100 {
@@ -224,4 +425,11 @@ enum t100_touch_event {
     UNSUPUP,
     DOWNSUP,
     DOWNUP
+};
+
+enum t100_touch_type {
+    MXT_FINGER = 1,
+    MXT_PASSIVE_STYLUS,
+    MXT_GLOVE = 5,
+    MXT_LARGE_TOUCH
 };

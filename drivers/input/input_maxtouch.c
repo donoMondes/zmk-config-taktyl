@@ -11,16 +11,6 @@
 
 LOG_MODULE_REGISTER(maxtouch, CONFIG_INPUT_LOG_LEVEL);
 
-// TODO UGH
-#define DIVIDE_UNSIGNED_ROUND(numerator, denominator)                                              \
-    (((numerator) + ((denominator) / 2)) / (denominator))
-#define CPI_TO_SAMPLES(cpi, dist_in_mm) (DIVIDE_UNSIGNED_ROUND((cpi) * (dist_in_mm) * 10, 254))
-#define SAMPLES_TO_CPI(samples, dist_in_mm) (DIVIDE_UNSIGNED_ROUND((samples) * 254, (dist_in_mm) * 10)
-#define MXT_DEFAULT_DPI 600
-#define MXT_TOUCH_THRESHOLD 18
-#define MXT_GAIN 4
-#define MXT_DX_GAIN 255
-
 static int mxt_seq_read(const struct device *dev, const uint16_t addr, void *buf,
                         const uint8_t len) {
     const struct mxt_config *config = dev->config;
@@ -175,6 +165,7 @@ static int mxt_load_object_table(const struct device *dev, struct mxt_informatio
             break;
         case 6:
             data->t6_command_processor_address = addr;
+            data->t6_command_processor_report_id = report_id;
             break;
         case 7:
             data->t7_powerconfig_address = addr;
@@ -182,11 +173,33 @@ static int mxt_load_object_table(const struct device *dev, struct mxt_informatio
         case 8:
             data->t8_acquisitionconfig_address = addr;
             break;
+        case 25:
+            data->t25_self_test_address = addr;
+            data->t25_self_test_report_id = report_id;
+            break;
+        case 37:
+            data->t37_diagnostic_debug_address = addr;
+            break;
+        case 42:
+            data->t42_proci_touchsupression_address = addr;
+            break;
         case 44:
             data->t44_message_count_address = addr;
             break;
         case 46:
             data->t46_cte_config_address = addr;
+            break;
+        case 47:
+            data->t47_proci_stylus_address = addr;
+            break;
+        case 56:
+            data->t56_proci_shieldless_address = addr;
+            break;
+        case 65:
+            data->t65_proci_lensbending_address = addr;
+            break;
+        case 80:
+            data->t80_proci_retransmissioncompensation_address = addr;
             break;
         case 100:
             data->t100_multiple_touch_touchscreen_address = addr;
@@ -212,6 +225,7 @@ static int mxt_load_config(const struct device *dev,
         t7_conf.idleacqint = config->idle_acq_time;
         t7_conf.actacqint = config->active_acq_time;
         t7_conf.actv2idleto = config->active_to_idle_timeout;
+        t7_conf.cfg = MXT_T7_CFG_ACTVPIPEEN | MXT_T7_CFG_IDLEPIPEEN; // Enable pipelining in both active and idle mode
 
         ret = mxt_seq_write(dev, data->t7_powerconfig_address, &t7_conf, sizeof(t7_conf));
         if (ret < 0) {
@@ -222,9 +236,95 @@ static int mxt_load_config(const struct device *dev,
 
     if (data->t8_acquisitionconfig_address) {
         struct mxt_gen_acquisitionconfig_t8 t8_conf = {0};
+        t8_conf.chrgtime = config->charge_time;
+        t8_conf.tchautocal = 50;
+        t8_conf.atchcalst = 0;
+
+        // Antitouch detection - reject palms etc..
+        t8_conf.atchcalsthr = 50;
+        t8_conf.atchfrccalthr = 50;
+        t8_conf.atchfrccalratio = 25;
+        t8_conf.measallow = config->allowed_measurement_types;
+
         ret = mxt_seq_write(dev, data->t8_acquisitionconfig_address, &t8_conf, sizeof(t8_conf));
         if (ret < 0) {
             LOG_ERR("Failed to set T8 config: %d", ret);
+            return ret;
+        }
+    }
+
+#ifdef MXT_ENABLE_STYLUS
+    if (data->t42_proci_touchsupression_address) {
+        struct mxt_proci_touchsupression_t42 t42_conf = {};
+
+        t42_conf.ctrl = MXT_T42_CTRL_ENABLE | MXT_T42_CTRL_SHAPEEN;
+        t42_conf.maxapprarea = 0;   // Default (0): suppress any touch that approaches >40 channels.
+        t42_conf.maxtcharea = 0;    // Default (0): suppress any touch that covers >35 channels.
+        t42_conf.maxnumtchs = 6;    // Suppress all touches if >6 are detected.
+        t42_conf.supdist = 0;       // Default (0): Suppress all touches within 5 nodes of a suppressed large object detection.
+        t42_conf.disthyst = 0;
+        t42_conf.supstrength = 0;   // Default (0): suppression strength of 128.
+        t42_conf.supextto = 0;      // Timeout to save power; set to 0 to disable.
+        t42_conf.shapestrength = 0; // Default (0): shape suppression strength of 10, range [0, 31].
+        t42_conf.maxscrnarea = 0;
+        t42_conf.edgesupstrength = 0;
+        t42_conf.cfg = 1;
+
+        ret = mxt_seq_write(dev, data->t42_proci_touchsupression_address, &t42_conf, sizeof(t42_conf));
+        if (ret < 0) {
+            LOG_ERR("Failed to set T42 config: %d", ret);
+            return ret;
+        }
+    }
+#endif
+
+    // Mutural Capacitive Touch Engine (CTE) configuration, currently we use all the default values but it feels like some of this stuff might be important.
+    if (data->t46_cte_config_address) {
+        struct mxt_spt_cteconfig_t46 t46_conf = {};
+        t46_conf.idlesyncsperx = config->idle_syncs_per_x;      // ADC samples per X.
+        t46_conf.activesyncsperx = config->active_syncs_per_x;  // ADC samples per X.
+        t46_conf.inrushcfg = 0;                                 // Set Y-line inrush limit resistors.
+
+
+        ret = mxt_seq_write(dev, data->t46_cte_config_address, &t46_conf, sizeof(t46_conf));
+        if (ret < 0) {
+            LOG_ERR("Failed to set T46 config: %d", ret);
+            return ret;
+        }
+    }
+
+#ifdef MXT_ENABLE_STYLUS
+    if (data->t47_proci_stylus_address) {
+        struct mxt_proci_stylus_t47 t47_conf = {};
+        t47_conf.cfg = MXT_T47_CFG_SUPSTY;  // Supress stylus detections when normal touches are present.
+        t47_conf.contmax = 80;              // The maximum contact diameter of the stylus in 0.1mm increments
+        t47_conf.maxtcharea = 100;          // Maximum touch area a contact can have an still be considered a stylus
+        t47_conf.stability = 30;            // Higher values prevent the stylus from dropping out when it gets small
+        t47_conf.confthr = 6;               // Higher values increase the chances of correctly detecting as stylus, but introduce a delay
+        t47_conf.amplthr = 60;              // Any touches smaller than this are classified as stylus touches
+        t47_conf.supstyto = 5;              // Continue to suppress stylus touches until supstyto x 200ms after the last touch is removed.
+        t47_conf.hoversup = 200;            // 255 Disables hover supression
+        t47_conf.maxnumsty = 1;             // Only report a single stylus
+        t47_conf.ctrl = 1;                  // Enable stylus detection
+
+        ret = mxt_seq_write(dev, data->t47_proci_stylus_address, &t47_conf, sizeof(t47_conf));
+        if (ret < 0) {
+            LOG_ERR("Failed to set T46 config: %d", ret);
+            return ret;
+        }
+    }
+#endif
+
+    if (data->t80_proci_retransmissioncompensation_address) {
+        struct mxt_proci_retransmissioncompensation_t80 t80_conf = {};
+        t80_conf.ctrl = config->retransmission_compensation_disable == false;
+        t80_conf.compgain = 5;
+        t80_conf.targetdelta = 125;
+        t80_conf.compthr = 60;
+
+        ret = mxt_seq_write(dev, data->t80_proci_retransmissioncompensation_address, &t80_conf, sizeof(t80_conf));
+        if (ret < 0) {
+            LOG_ERR("Failed to set T80 config: %d", ret);
             return ret;
         }
     }
@@ -240,8 +340,9 @@ static int mxt_load_config(const struct device *dev,
         }
 
         t100_conf.ctrl =
-            MXT_T100_CTRL_RPTEN | MXT_T100_CTRL_ENABLE; // Enable the t100 object, and enable
-                                                        // message reporting for the t100 object.1`
+            MXT_T100_CTRL_RPTEN | MXT_T100_CTRL_ENABLE | MXT_T100_CTRL_SCANEN;  // Enable the t100 object, and enable
+                                                                                // message reporting for the t100 object.1`
+                                                                                // and enable close scanning mode.
         uint8_t cfg1 = 0;
 
         if (config->repeat_each_cycle) {
@@ -262,7 +363,7 @@ static int mxt_load_config(const struct device *dev,
 
         t100_conf.cfg1 = cfg1; // Could also handle rotation, and axis inversion in hardware here
 
-        t100_conf.scraux = 0x1;                       // AUX data: Report the number of touch events
+        t100_conf.scraux = 0x7;                       // AUX data: Report the number of touch events, touch area, anti touch area
         t100_conf.numtch = config->max_touch_points;  // The number of touch reports
                                                       // we want to receive (upto 10)
         t100_conf.xsize = information->matrix_x_size; // Make configurable as this depends on the
@@ -270,33 +371,44 @@ static int mxt_load_config(const struct device *dev,
         t100_conf.ysize = information->matrix_y_size; // Make configurable as this depends on the
                                                       // sensor design.
                                                       //
-        t100_conf.xpitch = (MXT_SENSOR_WIDTH_MM * 10 / information->matrix_x_size) -
-                           50; // Pitch between X-Lines (5mm + 0.1mm * XPitch).
-        t100_conf.ypitch = (MXT_SENSOR_HEIGHT_MM * 10 / information->matrix_y_size) -
-                           50;          // Pitch between Y-Lines (5mm + 0.1mm * YPitch).
-        t100_conf.gain = MXT_GAIN;      // Single transmit gain for mutual capacitance measurements
-        t100_conf.dxgain = MXT_DX_GAIN; // Dual transmit gain for mutual capacitance
+        t100_conf.xpitch = (config->sensor_width * 10 / information->matrix_x_size); // Pitch between X-Lines (0.1mm * XPitch).
+        t100_conf.ypitch = (config->sensor_height * 10 / information->matrix_y_size); // Pitch between Y-Lines (0.1mm * YPitch).
+        t100_conf.xedgecfg = 9;
+        t100_conf.xedgedist = 10;
+        t100_conf.yedgecfg = 9;
+        t100_conf.yedgedist = 10;
+        t100_conf.gain = config->gain;  // Single transmit gain for mutual capacitance measurements
+        t100_conf.dxgain = 0;           // Dual transmit gain for mutual capacitance
                                         // measurements (255 = auto calibrate)
-        t100_conf.tchthr = MXT_TOUCH_THRESHOLD; // Touch threshold
-        t100_conf.mrgthr = 5;                   // Merge threshold
-        t100_conf.mrghyst = 5;                  // Merge threshold hysteresis
-        t100_conf.movsmooth = 224;              // The amount of smoothing applied to movements,
-                                                // this tails off at higher speeds
-        t100_conf.movfilter = 4 & 0xF; // The lower 4 bits are the speed response value, higher
-                                       // values reduce lag, but also smoothing
+        t100_conf.tchthr = config->touch_threshold;
+        t100_conf.tchhyst = config->touch_hysteresis;
+        t100_conf.intthr = config->internal_touch_threshold;
+        t100_conf.intthryst = config->internal_touch_hysteresis;
+        t100_conf.mrgthr = 5;           // Merge threshold
+        t100_conf.mrghyst = 10;         // Merge threshold hysteresis
+        t100_conf.mrgthradjstr = 20;
+        t100_conf.movsmooth = 0;        // The amount of smoothing applied to movements,
+                                        // this tails off at higher speeds
+        t100_conf.movfilter = 0;        // The lower 4 bits are the speed response value, higher
+                                        // values reduce lag, but also smoothing
 
         // These two fields implement a simple filter for reducing jitter, but large
         // values cause the pointer to stick in place before moving.
-        t100_conf.movhysti = 6; // Initial movement hysteresis
+        t100_conf.movhysti = 10; // Initial movement hysteresis
         t100_conf.movhystn = 4; // Next movement hysteresis
 
-        t100_conf.xrange = sys_cpu_to_le16(
-            CPI_TO_SAMPLES(MXT_DEFAULT_DPI,
-                           MXT_SENSOR_HEIGHT_MM)); // CPI handling, adjust the reported resolution
-        t100_conf.yrange = sys_cpu_to_le16(
-            CPI_TO_SAMPLES(MXT_DEFAULT_DPI,
-                           MXT_SENSOR_WIDTH_MM)); // CPI handling, adjust the reported resolution
-
+        t100_conf.tchdiup = 4; // MXT_UP touch detection integration - the number of cycles before the sensor decides an MXT_UP event has occurred
+        t100_conf.tchdidown = 2; // MXT_DOWN touch detection integration - the number of cycles before the sensor decides an MXT_DOWN event has occurred
+        t100_conf.nexttchdi = 2;
+        t100_conf.calcfg = 0;
+        if (config->swap_xy) {
+            t100_conf.xrange = sys_cpu_to_le16(CONFIG_ZMK_TRACKPAD_LOGICAL_Y-1);
+            t100_conf.yrange = sys_cpu_to_le16(CONFIG_ZMK_TRACKPAD_LOGICAL_X-1);
+        }
+        else {
+            t100_conf.xrange = sys_cpu_to_le16(CONFIG_ZMK_TRACKPAD_LOGICAL_X-1);
+            t100_conf.yrange = sys_cpu_to_le16(CONFIG_ZMK_TRACKPAD_LOGICAL_Y-1);
+        }
         ret = mxt_seq_write(dev, data->t100_multiple_touch_touchscreen_address, &t100_conf,
                             sizeof(t100_conf));
         if (ret < 0) {
@@ -356,21 +468,33 @@ static int mxt_init(const struct device *dev) {
     return 0;
 }
 
-#define MXT_INST(n)                                                                                \
-    static struct mxt_data mxt_data_##n;                                                           \
-    static const struct mxt_config mxt_config_##n = {                                              \
-        .bus = I2C_DT_SPEC_INST_GET(n),                                                            \
-        .chg = GPIO_DT_SPEC_GET_OR(DT_DRV_INST(n), chg_gpios, {}),                                 \
-        .max_touch_points = DT_INST_PROP_OR(n, max_touch_points, 5),                               \
-        .idle_acq_time = DT_INST_PROP_OR(n, idle_acq_time_ms, 32),                                 \
-        .active_acq_time = DT_INST_PROP_OR(n, active_acq_time_ms, 10),                             \
-        .active_to_idle_timeout = DT_INST_PROP_OR(n, active_to_idle_timeout_ms, 50),               \
-        .repeat_each_cycle = DT_INST_PROP(n, repeat_each_cycle),                                   \
-        .swap_xy = DT_INST_PROP(n, swap_xy),                                                       \
-        .invert_x = DT_INST_PROP(n, invert_x),                                                     \
-        .invert_y = DT_INST_PROP(n, invert_y),                                                     \
-    };                                                                                             \
-    DEVICE_DT_INST_DEFINE(n, mxt_init, NULL, &mxt_data_##n, &mxt_config_##n, POST_KERNEL,          \
+#define MXT_INST(n)                                                                                     \
+    static struct mxt_data mxt_data_##n;                                                                \
+    static const struct mxt_config mxt_config_##n = {                                                   \
+        .bus = I2C_DT_SPEC_INST_GET(n),                                                                 \
+        .chg = GPIO_DT_SPEC_GET_OR(DT_DRV_INST(n), chg_gpios, {}),                                      \
+        .max_touch_points = DT_INST_PROP_OR(n, max_touch_points, 5),                                    \
+        .idle_acq_time = DT_INST_PROP_OR(n, idle_acq_time_ms, 32),                                      \
+        .active_acq_time = DT_INST_PROP_OR(n, active_acq_time_ms, 10),                                  \
+        .active_to_idle_timeout = DT_INST_PROP_OR(n, active_to_idle_timeout_ms, 50),                    \
+        .repeat_each_cycle = DT_INST_PROP(n, repeat_each_cycle),                                        \
+        .swap_xy = DT_INST_PROP(n, swap_xy),                                                            \
+        .invert_x = DT_INST_PROP(n, invert_x),                                                          \
+        .invert_y = DT_INST_PROP(n, invert_y),                                                          \
+        .sensor_width = DT_INST_PROP(n, sensor_width),                                                  \
+        .sensor_height = DT_INST_PROP(n, sensor_height),                                                \
+        .touch_threshold = DT_INST_PROP_OR(n, touch_threshold, 18),                                     \
+        .touch_hysteresis = DT_INST_PROP_OR(n, touch_hysteresis, 8),                                    \
+        .internal_touch_threshold = DT_INST_PROP_OR(n, internal_touch_threshold, 10),                   \
+        .internal_touch_hysteresis = DT_INST_PROP_OR(n, internal_touch_hysteresis, 4),                  \
+        .gain = DT_INST_PROP_OR(n, gain, 4),                                                            \
+        .charge_time = DT_INST_PROP_OR(n, charge_time, 10),                                             \
+        .allowed_measurement_types = DT_INST_PROP_OR(n, allowed_measurement_types, 3),                  \
+        .active_syncs_per_x = DT_INST_PROP_OR(n, active_syncs_per_x, 20),                               \
+        .idle_syncs_per_x = DT_INST_PROP_OR(n, idle_syncs_per_x, 20),                                   \
+        .retransmission_compensation_disable = DT_INST_PROP(n, retransmission_compensation_disable),    \
+    };                                                                                                  \
+    DEVICE_DT_INST_DEFINE(n, mxt_init, NULL, &mxt_data_##n, &mxt_config_##n, POST_KERNEL,               \
                           CONFIG_INPUT_INIT_PRIORITY, NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(MXT_INST)
