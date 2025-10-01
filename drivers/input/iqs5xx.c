@@ -68,7 +68,8 @@ static int iqs5xx_end_comm_window(const struct device *dev) {
 static void iqs5xx_button_release_work_handler(struct k_work *work) {
     struct k_work_delayable *dwork = k_work_delayable_from_work(work);
     struct iqs5xx_data *data = CONTAINER_OF(dwork, struct iqs5xx_data, button_release_work);
-
+    const struct device *dev = data->dev;
+    const struct iqs5xx_config *config = dev->config;
     // TODO: This loop should only deactivate one button.
     // Log a warning when that is not the case.
     // for (int i = 0; i <IQS5XX_INPUT_MAX_TOUCHES ; i++) {
