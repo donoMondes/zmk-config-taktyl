@@ -90,23 +90,14 @@ static void iqs5xx_button_release_work_handler(struct k_work *work) {
 
     for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
     {
-        /* We look for the prev_point in the current points list */
-		for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
-			if (prev_point_data[prev_finger].id == point_data[finger].id) 
-            {
-				break;
-			}
-        }
-		if(finger == IQS5XX_INPUT_MAX_TOUCHES)
+        if(config->max_touch_number>1)
         {
-            if(config->max_touch_number>1)
-            {
-                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,false,K_FOREVER);
-            }
-            input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-            input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+            input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,false,K_FOREVER);
         }
+        input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
+        input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
+        input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+        
     }
 }
 
