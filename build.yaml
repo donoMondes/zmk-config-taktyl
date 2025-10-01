@@ -18,5 +18,5 @@
 #
 ---
 include:
-  - board: peacock_controller
+  - board: nice_nano_v2
     shield: peacock_vik_module
