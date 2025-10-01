@@ -18,5 +18,5 @@
 #
 ---
 include:
-  - board: nice_nano_v2
-    shield: TakTil
+  - board: peacock_controller
+    shield: peacock_vik_module
