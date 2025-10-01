@@ -142,7 +142,7 @@ typedef union{
         uint8_t snap_toggle         :1;
         uint8_t switch_state        :1;
         uint8_t spare               :2;
-    }
+    };
 } iqs5xx_sys_info_1;
 
 typedef union{
@@ -154,7 +154,7 @@ typedef union{
         uint8_t alp_ati_error       :1;
         uint8_t alp_reati_occured   :1;
         uint8_t show_reset          :1;
-    }
+    };
 } iqs5xx_sys_info_0;
 
 struct iqs5xx_config {
