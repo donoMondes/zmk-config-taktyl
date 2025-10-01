@@ -1,19 +1,6 @@
 if SHIELD_TAKTIL
 
-if ZMK_TRACKPAD
+config ZMK_KEYBOARD_NAME
+    default "TakTil"
 
-config ZMK_TRACKPAD_LOGICAL_X
-	default 3685
-
-config ZMK_TRACKPAD_LOGICAL_Y
-	default 2150
-
-config ZMK_TRACKPAD_PHYSICAL_X
-	default 3072
-
-config ZMK_TRACKPAD_PHYSICAL_Y
-	default 2048
-
-endif # ZMK_TRACKPAD
-
-endif # SHIELD_PEACOCK_VIK_MODULE
+endif # SHIELD_TAKTIL
