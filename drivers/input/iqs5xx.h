@@ -63,21 +63,8 @@
 #define IQS5XX_PALM_REJECT_TIMEOUT 0x066D
 
 #define IQS5XX_SYSTEM_INFO_0 0x000F
-// System Info 0 bits.
-#define IQS5XX_SHOW_RESET BIT(7)
-#define IQS5XX_ALP_REATI_OCCURRED BIT(6)
-#define IQS5XX_ALP_ATI_ERROR BIT(5)
-#define IQS5XX_REATI_OCCURRED BIT(4)
-#define IQS5XX_ATI_ERROR BIT(3)
 
 #define IQS5XX_SYSTEM_INFO_1 0x0010
-// System Info 1 bits.
-#define IQS5XX_SWITCH_STATE BIT(5)
-#define IQS5XX_SNAP_TOGGLE BIT(4)
-#define IQS5XX_RR_MISSED BIT(3)
-#define IQS5XX_TOO_MANY_FINGERS BIT(2)
-#define IQS5XX_PALM_DETECT BIT(1)
-#define IQS5XX_TP_MOVEMENT BIT(0)
 
 // These 2 registers have the same bit map.
 // The first one configures the gestures,
@@ -217,4 +204,5 @@ struct iqs5xx_point_data {
     uint8_t id;     //Touch id
     uint16_t abs_x; //Touch absolute position on the x axis
     uint16_t abs_y; //Touch absolute position on the y axis
+    uint8_t size;  //Touch area/size
 };
