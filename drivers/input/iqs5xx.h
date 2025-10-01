@@ -133,7 +133,7 @@
 #define IQS5XX_INPUT_MAX_TOUCHES 5
 
 typedef union{
-    uint8_t sys_info_1;
+    uint8_t data;
     struct{
         uint8_t tp_movement         :1;
         uint8_t palm_detect         :1;
@@ -146,7 +146,7 @@ typedef union{
 } iqs5xx_sys_info_1;
 
 typedef union{
-    uint8_t sys_info_0;
+    uint8_t data;
     struct{
         uint8_t current_mode        :3;
         uint8_t ati_error           :1;
