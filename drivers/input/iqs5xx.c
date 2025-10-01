@@ -168,19 +168,19 @@ static void iqs5xx_work_handler(struct k_work *work) {
                             if(prev_point_data[finger_idx].size != 0)
                             {
                                 // Remove old point
-                                input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                                input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                                input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                                input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                                // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                                // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                                // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                                // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
                             }
                         }
                         else
                         {
                             // Remove old point
-                            input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                            input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                            input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                            // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                            // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                            // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                            // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
                         }
                         input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
