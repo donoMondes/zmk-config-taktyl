@@ -81,7 +81,7 @@
   		resolution_y = <1080>;
 
         bottom-beta = <100>;
-        stationary-threshold = <5>;
+        stationary-threshold = <10>;
 
         switch-xy;
 

@@ -132,6 +132,31 @@
 
 #define IQS5XX_INPUT_MAX_TOUCHES 5
 
+typedef union{
+    uint8_t sys_info_1;
+    struct{
+        uint8_t tp_movement         :1;
+        uint8_t palm_detect         :1;
+        uint8_t too_many_fingers    :1;
+        uint8_t report_missed       :1;
+        uint8_t snap_toggle         :1;
+        uint8_t switch_state        :1;
+        uint8_t spare               :2;
+    }
+} iqs5xx_sys_info_1;
+
+typedef union{
+    uint8_t sys_info_0;
+    struct{
+        uint8_t current_mode        :3;
+        uint8_t ati_error           :1;
+        uint8_t reati_occured       :1;
+        uint8_t alp_ati_error       :1;
+        uint8_t alp_reati_occured   :1;
+        uint8_t show_reset          :1;
+    }
+} iqs5xx_sys_info_0;
+
 struct iqs5xx_config {
     struct i2c_dt_spec i2c;
     struct gpio_dt_spec rdy_gpio;
