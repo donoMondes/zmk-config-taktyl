@@ -6,16 +6,16 @@ if SHIELD_PEACOCK_VIK_MODULE
 if ZMK_TRACKPAD
 
 config ZMK_TRACKPAD_LOGICAL_X
-	default 3685
+	default 1920
 
 config ZMK_TRACKPAD_LOGICAL_Y
-	default 2150
+	default 1080
 
 config ZMK_TRACKPAD_PHYSICAL_X
-	default 1560
+	default 3072
 
 config ZMK_TRACKPAD_PHYSICAL_Y
-	default 910
+	default 2048
 
 endif # ZMK_TRACKPAD
 
