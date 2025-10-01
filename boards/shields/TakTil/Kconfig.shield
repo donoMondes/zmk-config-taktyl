@@ -2,3 +2,4 @@ config SHIELD_TAKTIL
     def_bool $(shields_list_contains, TakTil)
     imply ZMK_MOUSE
 	imply ZMK_TRACKPAD
+    select I2C
