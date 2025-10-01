@@ -97,9 +97,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
     //uint8_t num_fingers;
     int ret;
 
-    uint8_t prev_finger;
-	uint8_t finger;
-
     // Read system info registers.
     ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0.data);
     if (ret < 0) {
@@ -144,7 +141,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
                 //input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                 if(finger_idx<config->max_touch_number)
                 {
-                    uint16_t abs_x, abs_y;
                     uint16_t current_reg_abs_x = (uint16_t)(IQS5XX_ABS_X + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
 
                     uint16_t current_reg_abs_y = (uint16_t)(IQS5XX_ABS_Y + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
