@@ -150,7 +150,7 @@
 #define DEFAULT_ZOOM_INITIAL_DISTANCE 0x32 
 #define DEFAULT_ZOOM_CONSECUTIVE_DISTANCE 0x19
 
-typedef struct PACKED{
+struct PACKED{
     bool tp_movement         :1;
     bool palm_detect         :1;
     bool too_many_fingers    :1;
@@ -160,7 +160,7 @@ typedef struct PACKED{
     uint8_t spare            :2;
 }iqs5xx_sys_info_1;
 
-typedef struct PACKED{
+struct PACKED{
     uint8_t current_mode     :3;
     bool ati_error           :1;
     bool reati_occured       :1;
@@ -169,12 +169,12 @@ typedef struct PACKED{
     bool show_reset          :1;
 }iqs5xx_sys_info_0;
 
-typedef struct PACKED {
+struct PACKED {
     iqs5xx_sys_info_0 sys_inf0;
     iqs5xx_sys_info_1 sys_inf1;
 }iqs5xx_sys_info;
 
-typedef struct PACKED {
+struct PACKED {
     uint8_t mode_select :3;
     bool    reseed      :1;
     bool    alp_reseed  :1;
@@ -183,13 +183,13 @@ typedef struct PACKED {
     bool    ack_reset   :1;
 }iqs5xx_sys_control_0;
 
-typedef struct PACKED {
+struct PACKED {
     bool    suspend     :1;
     bool    reset       :1;
     bool    unused      :6; 
 }iqs5xx_sys_control_1;
 
-typedef struct PACKED {
+struct PACKED {
     iqs5xx_sys_control_0 sys_ctrl0;
     iqs5xx_sys_control_1 sys_ctrl1;
 }iqs5xx_sys_control;
