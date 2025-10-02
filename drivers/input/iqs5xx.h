@@ -20,8 +20,17 @@
 #define IQS5XX_ALP_RESEED BIT(4)
 #define IQS5XX_RESEED BIT(3)
 
+// System ontrol 1 bits
+#define IQS5XX_SYSTEM_CONTROL_1 0x0432
+#define IQS5XX_ACK_RESET BIT(7)
+#define IQS5XX_AUTO_ATI BIT(5)
+#define IQS5XX_ALP_RESEED BIT(4)
+#define IQS5XX_RESEED BIT(3)
+
 // Report rate for the active mode
 #define IQS5XX_REPORT_RATE_ACTIVE_MODE 0x057A // 2 bytes
+#define IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE 0x057C // 2 bytes
+#define IQS5XX_REPORT_RATE_IDLE_MODE 0x057E // 2 bytes
 
 #define IQS5XX_SYSTEM_CONFIG_0 0x058E
 // System Config 0 bits.
@@ -83,8 +92,17 @@
 // Hold time + tap time is used as
 // a threshold for the press and
 // hold gesture.
-#define IQS5XX_HOLD_TIME 0x06BD
 // TODO: Make hold time configurable with KConfig.
+#define IQS5XX_TAP_TIME                 0x06B9
+#define IQS5XX_TAP_DISTANCE             0x06BB
+#define IQS5XX_HOLD_TIME                0x06BD
+#define IQS5XX_SWIPE_INIT_TIME          0x06BF
+#define IQS5XX_SWIPE_INIT_DISTANCE      0x06C1
+#define IQS5XX_SWIPE_CONSEC_TIME        0x06C3
+#define IQS5XX_SWIPE_CONSEC_DISTANCE    0x06C5
+#define IQS5XX_SCROLL_INIT_DISTANCE     0x06C8
+#define IQS5XX_ZOOM_INIT_DISTANCE       0x06CB
+#define IQS5XX_ZOOM_CONSEC_DISTANCE     0x06CD
 
 // Mouse button helpers.
 #define LEFT_BUTTON_BIT BIT(0)
@@ -119,30 +137,62 @@
 
 #define IQS5XX_INPUT_MAX_TOUCHES 5
 
-typedef union{
-    uint8_t data;
-    struct{
-        uint8_t tp_movement         :1;
-        uint8_t palm_detect         :1;
-        uint8_t too_many_fingers    :1;
-        uint8_t report_missed       :1;
-        uint8_t snap_toggle         :1;
-        uint8_t switch_state        :1;
-        uint8_t spare               :2;
-    };
-} iqs5xx_sys_info_1;
 
-typedef union{
-    uint8_t data;
-    struct{
-        uint8_t current_mode        :3;
-        uint8_t ati_error           :1;
-        uint8_t reati_occured       :1;
-        uint8_t alp_ati_error       :1;
-        uint8_t alp_reati_occured   :1;
-        uint8_t show_reset          :1;
-    };
-} iqs5xx_sys_info_0;
+// default values
+#define DEFAULT_TAP_TIME 0x96
+#define DEFAULT_TAP_DISTANCE 0x19 
+#define DEFAULT_HOLD_TIME 0x12C 
+#define DEFAULT_SWIPE_INITIAL_TIME 0x64 // 0x96 
+#define DEFAULT_SWIPE_INITIAL_DISTANCE 0x12C 
+#define DEFAULT_SWIPE_CONSECUTIVE_TIME 0x0 
+#define DEFAULT_SWIPE_CONSECUTIVE_DISTANCE 0x7D0 
+#define DEFAULT_SCROLL_INITIAL_DISTANCE 0x32 
+#define DEFAULT_ZOOM_INITIAL_DISTANCE 0x32 
+#define DEFAULT_ZOOM_CONSECUTIVE_DISTANCE 0x19
+
+typedef struct PACKED{
+    bool tp_movement         :1;
+    bool palm_detect         :1;
+    bool too_many_fingers    :1;
+    bool report_missed       :1;
+    bool snap_toggle         :1;
+    bool switch_state        :1;
+    uint8_t spare            :2;
+}iqs5xx_sys_info_1;
+
+typedef struct PACKED{
+    uint8_t current_mode     :3;
+    bool ati_error           :1;
+    bool reati_occured       :1;
+    bool alp_ati_error       :1;
+    bool alp_reati_occured   :1;
+    bool show_reset          :1;
+}iqs5xx_sys_info_0;
+
+typedef struct PACKED {
+    iqs5xx_sys_info_0 sys_inf0;
+    iqs5xx_sys_info_1 sys_inf1;
+}iqs5xx_sys_info;
+
+typedef struct PACKED {
+    uint8_t mode_select :3;
+    bool    reseed      :1;
+    bool    alp_reseed  :1;
+    bool    auto_ati    :1;
+    bool    unused      :1;
+    bool    ack_reset   :1;
+}iqs5xx_sys_control_0;
+
+typedef struct PACKED {
+    bool    suspend     :1;
+    bool    reset       :1;
+    bool    unused      :6; 
+}iqs5xx_sys_control_1;
+
+typedef struct PACKED {
+    iqs5xx_sys_control_0 sys_ctrl0;
+    iqs5xx_sys_control_1 sys_ctrl1;
+}iqs5xx_sys_control;
 
 struct iqs5xx_config {
     struct i2c_dt_spec i2c;

@@ -98,13 +98,13 @@ static void iqs5xx_work_handler(struct k_work *work) {
     int ret;
 
     // Read system info registers.
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0.data);
+    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0);
     if (ret < 0) {
         LOG_ERR("Failed to read system info 0: %d", ret);
         goto end_comm;
     }
 
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_1, &sys_info_1.data);
+    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_1, &sys_info_1);
     if (ret < 0) {
         LOG_ERR("Failed to read system info 1: %d", ret);
         goto end_comm;
@@ -138,7 +138,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
             {
                 // current absolute slot for absolute position
                 point_data[finger_idx].id = finger_idx;
-                //input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
+                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                 if(finger_idx<config->max_touch_number)
                 {
                     uint16_t current_reg_abs_x = (uint16_t)(IQS5XX_ABS_X + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
@@ -162,27 +162,27 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
                     if(point_data[finger_idx].abs_x!=0 || point_data[finger_idx].abs_y!=0)
                     {   
-                        if((prev_point_data[finger_idx].abs_x == point_data[finger_idx].abs_x)
-                        &&(prev_point_data[finger_idx].abs_y == point_data[finger_idx].abs_y))
-                        {
-                            if(prev_point_data[finger_idx].size != 0)
-                            {
-                                // Remove old point
-                                // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                                // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                                // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                                // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                            }
-                        }
-                        else
-                        {
-                            // Remove old point
-                            // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                            // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                            // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                            // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                        }
-                        input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
+                        // if((prev_point_data[finger_idx].abs_x == point_data[finger_idx].abs_x)
+                        // &&(prev_point_data[finger_idx].abs_y == point_data[finger_idx].abs_y))
+                        // {
+                        //     if(prev_point_data[finger_idx].size != 0)
+                        //     {
+                        //         // Remove old point
+                        //         // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                        //         // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                        //         // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                        //         // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                        //     }
+                        // }
+                        // else
+                        // {
+                        //     // Remove old point
+                        //     // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                        //     // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                        //     // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                        //     // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                        // }
+                        // input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
@@ -192,26 +192,26 @@ static void iqs5xx_work_handler(struct k_work *work) {
         }
     }
     
-    // for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
-    // {
-    //     /* We look for the prev_point in the current points list */
-	// 	for (finger = 0; finger < num_fingers; finger++) {
-	// 		if (prev_point_data[prev_finger].id == point_data[finger].id) 
-    //         {
-	// 			break;
-	// 		}
-    //     }
-	// 	if(finger == num_fingers)
-    //     {
-    //         if(config->max_touch_number>1)
-    //         {
-    //             input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
-    //         }
-    //         input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-    //         input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-    //         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-    //     }
-    // }
+    for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
+    {
+        /* We look for the prev_point in the current points list */
+		for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
+			if (prev_point_data[prev_finger].id == point_data[finger].id) 
+            {
+				break;
+			}
+        }
+		if(finger == num_fingers)
+        {
+            if(config->max_touch_number>1)
+            {
+                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
+            }
+            input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
+            input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
+            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+        }
+    }
 
     memcpy(prev_point_data,point_data,sizeof(point_data));
 
@@ -231,20 +231,18 @@ static int iqs5xx_setup_device(const struct device *dev) {
     const struct iqs5xx_config *config = dev->config;
     int ret;
 
-    // Enable event mode and trackpad events.
-    ret = iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_1,
-                            IQS5XX_EVENT_MODE | IQS5XX_TP_EVENT | IQS5XX_GESTURE_EVENT);
-    if (ret < 0) {
-        LOG_ERR("Failed to configure event mode: %d", ret);
-        return ret;
-    }
+    // Change resolution
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_X,config->resolution_x);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_Y,config->resolution_y);
 
     // Change report rate value
-    ret = iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_ACTIVE_MODE,config->report_rate_active_mode);
-    if (ret < 0) {
-        LOG_ERR("Failed to change report rate: %d", ret);
-        return ret;
-    }
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_ACTIVE_MODE,config->report_rate_active_mode);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE,config->report_rate_active_mode);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_MODE,config->report_rate_active_mode);
+
+    // Enable event mode and trackpad events.
+    ret |= iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_1,
+                            IQS5XX_EVENT_MODE | IQS5XX_TP_EVENT | IQS5XX_GESTURE_EVENT | IQS5XX_TOUCH_EVENT);
 
     // Change Maximum number of touch point
     ret = iqs5xx_write_reg8(dev, IQS5XX_MAX_MULTI_TOUCHES,config->max_touch_number);
@@ -279,20 +277,6 @@ static int iqs5xx_setup_device(const struct device *dev) {
         return ret;
     }
 
-    // Change resolution
-
-    ret = iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_X,config->resolution_x);
-    if (ret < 0) {
-        LOG_ERR("Failed to change x axis resolution: %d", ret);
-        return ret;
-    }
-
-    ret = iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_Y,config->resolution_y);
-    if (ret < 0) {
-        LOG_ERR("Failed to change y axis resolution: %d", ret);
-        return ret;
-    }
-
     // TODO: Expose these through dts bindings.
     // Set filter settings with:
     // - IIR filter enabled
@@ -315,21 +299,31 @@ static int iqs5xx_setup_device(const struct device *dev) {
         LOG_ERR("Failed to configure single finger gestures: %d", ret);
         return ret;
     }
-
-    // Configure the hold time for the press and hold gesture.
-    ret = iqs5xx_write_reg16(dev, IQS5XX_HOLD_TIME, config->press_and_hold_time);
-    if (ret < 0) {
-        LOG_ERR("Failed to configure the hold time: %d", ret);
-        return ret;
-    }
-
+    
     uint8_t two_finger_gestures = 0;
     two_finger_gestures |= config->two_finger_tap ? IQS5XX_TWO_FINGER_TAP : 0;
     two_finger_gestures |= config->scroll ? IQS5XX_SCROLL : 0;
+    two_finger_gestures |= IQS5XX_ZOOM;
     // Configure multi finger gestures.
-    ret = iqs5xx_write_reg8(dev, IQS5XX_MULTI_FINGER_GESTURES_CONF, two_finger_gestures);
+    ret |= iqs5xx_write_reg8(dev, IQS5XX_MULTI_FINGER_GESTURES_CONF, two_finger_gestures);
     if (ret < 0) {
         LOG_ERR("Failed to configure multi finger gestures: %d", ret);
+        return ret;
+    }
+
+    // Configure the hold time for the press and hold gesture.
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_TAP_TIME, DEFAULT_TAP_TIME);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_TAP_DISTANCE, DEFAULT_TAP_DISTANCE);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_HOLD_TIME, DEFAULT_HOLD_TIME);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_SWIPE_INIT_TIME, DEFAULT_SWIPE_INITIAL_TIME);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_SWIPE_INIT_DISTANCE, DEFAULT_SWIPE_INITIAL_DISTANCE);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_SWIPE_CONSEC_TIME, DEFAULT_SWIPE_CONSECUTIVE_TIME);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_SWIPE_CONSEC_DISTANCE, DEFAULT_SWIPE_CONSECUTIVE_DISTANCE);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_SCROLL_INIT_DISTANCE, DEFAULT_SCROLL_INITIAL_DISTANCE);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_ZOOM_INIT_DISTANCE, DEFAULT_ZOOM_INITIAL_DISTANCE);
+    ret |=iqs5xx_write_reg16(dev, IQS5XX_ZOOM_CONSEC_DISTANCE, DEFAULT_ZOOM_CONSECUTIVE_DISTANCE);
+    if (ret < 0) {
+        LOG_ERR("Failed to configure timing gesture settings: %d", ret);
         return ret;
     }
 
@@ -346,7 +340,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
     }
 
     // Configure system settings.
-    ret = iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_0, IQS5XX_SETUP_COMPLETE | IQS5XX_WDT);
+    ret = iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_0, IQS5XX_SETUP_COMPLETE | IQS5XX_WDT | IQS5XX_REATI);
     if (ret < 0) {
         LOG_ERR("Failed to configure system: %d", ret);
         return ret;
