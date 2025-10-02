@@ -192,7 +192,7 @@ typedef union {
     struct {
     bool    suspend     :1;
     bool    reset       :1;
-    bool    unused      :6; 
+    uint8_t unused      :6; 
     };
 }iqs5xx_sys_control_1;
 
