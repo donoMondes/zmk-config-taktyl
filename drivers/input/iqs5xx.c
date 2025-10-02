@@ -18,6 +18,8 @@
 
 LOG_MODULE_REGISTER(iqs5xx, CONFIG_INPUT_LOG_LEVEL);
 
+static struct iqs5xx_point_data point_data[IQS5XX_INPUT_MAX_TOUCHES];
+
 static int iqs5xx_read_reg16(const struct device *dev, uint16_t reg, uint16_t *val) {
     const struct iqs5xx_config *config = dev->config;
     uint8_t buf[2];
@@ -87,17 +89,12 @@ static void iqs5xx_work_handler(struct k_work *work) {
     const struct device *dev = data->dev;
     const struct iqs5xx_config *config = dev->config;
 
-    static struct iqs5xx_point_data point_data[IQS5XX_INPUT_MAX_TOUCHES];
-    static struct iqs5xx_point_data prev_point_data[IQS5XX_INPUT_MAX_TOUCHES];
-
     uint8_t prev_finger;
     uint8_t finger;
 
     iqs5xx_sys_info_1 sys_info_1;
     iqs5xx_sys_info_0 sys_info_0;
 
-    // uint8_t gesture_events_0, gesture_events_1, 
-    //uint8_t num_fingers;
     int ret;
 
     // Read system info registers.
@@ -113,18 +110,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
 
-    // ret = iqs5xx_read_reg8(dev, IQS5XX_GESTURE_EVENTS_0, &gesture_events_0);
-    // if (ret < 0) {
-    //     LOG_ERR("Failed to read gesture events: %d", ret);
-    //     goto end_comm;
-    // }
-
-    // ret = iqs5xx_read_reg8(dev, IQS5XX_GESTURE_EVENTS_1, &gesture_events_1);
-    // if (ret < 0) {
-    //     LOG_ERR("Failed to read gesture events 1: %d", ret);
-    //     goto end_comm;
-    // }
-
     // Handle reset indication.
     if (sys_info_0.show_reset) {
         LOG_INF("Device reset detected");
@@ -134,8 +119,8 @@ static void iqs5xx_work_handler(struct k_work *work) {
     }
 
     // Handle movement and gestures.
-    if (sys_info_1.tp_movement) {
-        for(uint8_t finger_idx = 0; finger_idx<IQS5XX_INPUT_MAX_TOUCHES;finger_idx++)
+    if (sys_info_1.tp_movement && !sys_info_1.palm_detect) {
+        for(uint8_t finger_idx = 0; finger_idx<config->max_touch_number;finger_idx++)
         {
             if(config->max_touch_number>1)
             {
@@ -185,7 +170,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
                             // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
                             //input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
                         }
-                        input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
@@ -216,8 +200,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
     //     }
     // }
 
-    memcpy(prev_point_data,point_data,sizeof(point_data));
-
 end_comm:
     // End communication window.
     iqs5xx_end_comm_window(dev);
@@ -240,8 +222,8 @@ static int iqs5xx_setup_device(const struct device *dev) {
 
     // Change report rate value
     ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_ACTIVE_MODE,config->report_rate_active_mode);
-    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE,config->report_rate_active_mode);
-    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_MODE,config->report_rate_active_mode);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE,config->report_rate_active_mode*2);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_MODE,config->report_rate_active_mode*2);
 
     // Enable event mode and trackpad events.
     ret |= iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_1,
@@ -286,8 +268,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
     // - MAV filter enabled
     // - IIR select disabled (dynamic IIR)
     // - ALP count filter enabled
-    ret = iqs5xx_write_reg8(dev, IQS5XX_FILTER_SETTINGS,
-                            IQS5XX_IIR_FILTER | IQS5XX_MAV_FILTER | IQS5XX_ALP_COUNT_FILTER);
+    ret = iqs5xx_write_reg8(dev, IQS5XX_FILTER_SETTINGS, IQS5XX_MAV_FILTER | IQS5XX_ALP_COUNT_FILTER);
     if (ret < 0) {
         LOG_ERR("Failed to configure filter settings: %d", ret);
         return ret;

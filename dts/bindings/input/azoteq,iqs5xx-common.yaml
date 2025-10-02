@@ -51,7 +51,7 @@ properties:
   report_rate_active_mode:
     type: int
     description: "report rate for the active mode in ms (refer to the IQS5xx datasheet)"
-    default: 10
+    default: 5
 
   palm_rejection:
     type: boolean
@@ -65,7 +65,7 @@ properties:
   palm_reject_timeout:
     type: int
     description: "Timeout to deactivate palm reject (multiple of 32 ms)"
-    default : 1
+    default : 4
 
   max_touch_number:
     type: int
