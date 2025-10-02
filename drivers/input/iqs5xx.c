@@ -141,7 +141,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
             {
                 // current absolute slot for absolute position
                 point_data[finger_idx].id = finger_idx;
-                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
+                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,true,K_FOREVER);
                 if(finger_idx<config->max_touch_number)
                 {
                     uint16_t current_reg_abs_x = (uint16_t)(IQS5XX_ABS_X + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
@@ -165,27 +165,27 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
                     if(point_data[finger_idx].abs_x!=0 || point_data[finger_idx].abs_y!=0)
                     {   
-                        // if((prev_point_data[finger_idx].abs_x == point_data[finger_idx].abs_x)
-                        // &&(prev_point_data[finger_idx].abs_y == point_data[finger_idx].abs_y))
-                        // {
-                        //     if(prev_point_data[finger_idx].size != 0)
-                        //     {
-                        //         // Remove old point
-                        //         // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                        //         // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                        //         // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                        //         // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                        //     }
-                        // }
-                        // else
-                        // {
-                        //     // Remove old point
-                        //     // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                        //     // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                        //     // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                        //     // input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                        // }
-                        // input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
+                        if((prev_point_data[finger_idx].abs_x == point_data[finger_idx].abs_x)
+                        &&(prev_point_data[finger_idx].abs_y == point_data[finger_idx].abs_y))
+                        {
+                            if(prev_point_data[finger_idx].size != 0)
+                            {
+                                // Remove old point
+                                // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                                // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                                // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                                input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                            }
+                        }
+                        else
+                        {
+                            // Remove old point
+                            // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
+                            // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
+                            // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
+                            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                        }
+                        input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
@@ -195,26 +195,26 @@ static void iqs5xx_work_handler(struct k_work *work) {
         }
     }
     
-    for(prev_finger = 0; prev_finger < IQS5XX_INPUT_MAX_TOUCHES ; prev_finger++)
-    {
-        /* We look for the prev_point in the current points list */
-		for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
-			if (prev_point_data[prev_finger].id == point_data[finger].id) 
-            {
-				break;
-			}
-        }
-		if(finger == IQS5XX_INPUT_MAX_TOUCHES)
-        {
-            if(config->max_touch_number>1)
-            {
-                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
-            }
-            input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-            input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-        }
-    }
+    // for(prev_finger = 0; prev_finger < IQS5XX_INPUT_MAX_TOUCHES ; prev_finger++)
+    // {
+    //     /* We look for the prev_point in the current points list */
+	// 	for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
+	// 		if (prev_point_data[prev_finger].id == point_data[finger].id) 
+    //         {
+	// 			break;
+	// 		}
+    //     }
+	// 	if(finger == IQS5XX_INPUT_MAX_TOUCHES)
+    //     {
+    //         if(config->max_touch_number>1)
+    //         {
+    //             input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
+    //         }
+    //         input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
+    //         input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
+    //         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+    //     }
+    // }
 
     memcpy(prev_point_data,point_data,sizeof(point_data));
 
@@ -235,7 +235,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
     int ret;
 
     // Change resolution
-    ret |= iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_X,config->resolution_x);
+    ret = iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_X,config->resolution_x);
     ret |= iqs5xx_write_reg16(dev, IQS5XX_RESOLUTION_Y,config->resolution_y);
 
     // Change report rate value
