@@ -98,13 +98,13 @@ static void iqs5xx_work_handler(struct k_work *work) {
     int ret;
 
     // Read system info registers.
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0);
+    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0.data);
     if (ret < 0) {
         LOG_ERR("Failed to read system info 0: %d", ret);
         goto end_comm;
     }
 
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_1, &sys_info_1);
+    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_1, &sys_info_1.data);
     if (ret < 0) {
         LOG_ERR("Failed to read system info 1: %d", ret);
         goto end_comm;

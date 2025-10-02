@@ -150,7 +150,9 @@
 #define DEFAULT_ZOOM_INITIAL_DISTANCE 0x32 
 #define DEFAULT_ZOOM_CONSECUTIVE_DISTANCE 0x19
 
-typedef struct iqs5xx_sys_info_1{
+typedef union {
+    uint8_t data;
+    struct {
     bool tp_movement         :1;
     bool palm_detect         :1;
     bool too_many_fingers    :1;
@@ -158,41 +160,42 @@ typedef struct iqs5xx_sys_info_1{
     bool snap_toggle         :1;
     bool switch_state        :1;
     uint8_t spare            :2;
-};
+    };
+}iqs5xx_sys_info_1;
 
-typedef struct iqs5xx_sys_info_0{
+typedef union {
+    uint8_t data;
+    struct {
     uint8_t current_mode     :3;
     bool ati_error           :1;
     bool reati_occured       :1;
     bool alp_ati_error       :1;
     bool alp_reati_occured   :1;
     bool show_reset          :1;
-};
+    };
+}iqs5xx_sys_info_0;
 
-typedef struct iqs5xx_sys_info{
-    iqs5xx_sys_info_0 sys_inf0;
-    iqs5xx_sys_info_1 sys_inf1;
-};
-
-typedef struct iqs5xx_sys_control_0{
+typedef union {
+    uint8_t data;
+    struct {
     uint8_t mode_select :3;
     bool    reseed      :1;
     bool    alp_reseed  :1;
     bool    auto_ati    :1;
     bool    unused      :1;
     bool    ack_reset   :1;
-};
+    };
+}iqs5xx_sys_control_0;
 
-typedef struct iqs5xx_sys_control_1{
+typedef union {
+    uint8_t data;
+    struct {
     bool    suspend     :1;
     bool    reset       :1;
     bool    unused      :6; 
-};
+    };
+}iqs5xx_sys_control_1;
 
-typedef struct iqs5xx_sys_control{
-    iqs5xx_sys_control_0 sys_ctrl0;
-    iqs5xx_sys_control_1 sys_ctrl1;
-};
 
 struct iqs5xx_config {
     struct i2c_dt_spec i2c;
