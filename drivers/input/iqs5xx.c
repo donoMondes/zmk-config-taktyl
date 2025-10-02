@@ -63,27 +63,6 @@ static int iqs5xx_end_comm_window(const struct device *dev) {
     return i2c_write_dt(&config->i2c, buf, sizeof(buf));
 }
 
-// static void iqs5xx_button_release_work_handler(struct k_work *work) {
-//     struct k_work_delayable *dwork = k_work_delayable_from_work(work);
-//     struct iqs5xx_data *data = CONTAINER_OF(dwork, struct iqs5xx_data, button_release_work);
-
-//     // TODO: This loop should only deactivate one button.
-//     // Log a warning when that is not the case.
-//     for (int i = 0; i <IQS5XX_INPUT_MAX_TOUCHES ; i++) {
-//         /* We look for the prev_point in the current points list */
-//         if(finger == num_fingers)
-//         {
-//             if(config->max_touch_number>1)
-//             {
-//                 input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
-//             }
-//             input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-//             input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-//             input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-//         }
-//     }
-// }
-
 static void iqs5xx_work_handler(struct k_work *work) {
     struct iqs5xx_data *data = CONTAINER_OF(work, struct iqs5xx_data, work);
     const struct device *dev = data->dev;
@@ -150,26 +129,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
                     if(point_data[finger_idx].abs_x!=0 || point_data[finger_idx].abs_y!=0)
                     {   
-                        if((prev_point_data[finger_idx].abs_x == point_data[finger_idx].abs_x)
-                        &&(prev_point_data[finger_idx].abs_y == point_data[finger_idx].abs_y))
-                        {
-                            if(prev_point_data[finger_idx].size != 0)
-                            {
-                                // Remove old point
-                                // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                                // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                                // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                                //input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                            }
-                        }
-                        else
-                        {
-                            // Remove old point
-                            // input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_point_data[finger_idx].id,false,K_FOREVER);
-                            // input_report_abs(dev, INPUT_ABS_X, prev_point_data[finger_idx].abs_x, false, K_FOREVER);
-                            // input_report_abs(dev, INPUT_ABS_Y, prev_point_data[finger_idx].abs_y, false, K_FOREVER);
-                            //input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-                        }
                         input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
                         input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
@@ -179,27 +138,6 @@ static void iqs5xx_work_handler(struct k_work *work) {
         }
     }
     
-    // for(prev_finger = 0; prev_finger < IQS5XX_INPUT_MAX_TOUCHES ; prev_finger++)
-    // {
-    //     /* We look for the prev_point in the current points list */
-	// 	for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
-	// 		if (prev_point_data[prev_finger].id == point_data[finger].id) 
-    //         {
-	// 			break;
-	// 		}
-    //     }
-	// 	if(finger == IQS5XX_INPUT_MAX_TOUCHES)
-    //     {
-    //         if(config->max_touch_number>1)
-    //         {
-    //             input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
-    //         }
-    //         input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-    //         input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-    //         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-    //     }
-    // }
-
 end_comm:
     // End communication window.
     iqs5xx_end_comm_window(dev);
@@ -352,7 +290,6 @@ static int iqs5xx_init(const struct device *dev) {
 
     data->dev = dev;
     k_work_init(&data->work, iqs5xx_work_handler);
-    // k_work_init_delayable(&data->button_release_work, iqs5xx_button_release_work_handler);
 
     // Configure reset GPIO if available.
     if (config->reset_gpio.port) {
