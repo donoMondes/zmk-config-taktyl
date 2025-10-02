@@ -90,6 +90,9 @@ static void iqs5xx_work_handler(struct k_work *work) {
     static struct iqs5xx_point_data point_data[IQS5XX_INPUT_MAX_TOUCHES];
     static struct iqs5xx_point_data prev_point_data[IQS5XX_INPUT_MAX_TOUCHES];
 
+    uint8_t prev_finger;
+    uint8_t finger;
+
     iqs5xx_sys_info_1 sys_info_1;
     iqs5xx_sys_info_0 sys_info_0;
 
@@ -192,7 +195,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         }
     }
     
-    for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
+    for(prev_finger = 0; prev_finger < IQS5XX_INPUT_MAX_TOUCHES ; prev_finger++)
     {
         /* We look for the prev_point in the current points list */
 		for (finger = 0; finger < IQS5XX_INPUT_MAX_TOUCHES; finger++) {
