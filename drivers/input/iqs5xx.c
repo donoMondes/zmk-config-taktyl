@@ -132,7 +132,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
                     if (ret < 0) {
                         goto end_comm;
                     }
-                    ret = iqs5xx_read_reg8(dev, curent_pressure, &point_data[finger_idx].pressure);
+                    ret = iqs5xx_read_reg16(dev, curent_pressure, &point_data[finger_idx].pressure);
                     if (ret < 0) {
                         goto end_comm;
                     }
