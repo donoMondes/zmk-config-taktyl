@@ -16,6 +16,10 @@
 
 #include "iqs5xx.h"
 
+#define INPUT_ABS_MT_POSITION_X 0x35
+#define INPUT_ABS_MT_POSITION_Y 0x36
+#define INPUT_ABS_MT_PRESSURE   0x3a
+
 LOG_MODULE_REGISTER(iqs5xx, CONFIG_INPUT_LOG_LEVEL);
 
 static struct iqs5xx_point_data point_data[IQS5XX_INPUT_MAX_TOUCHES];
@@ -114,6 +118,8 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
                     uint16_t current_size = (uint16_t)(IQS5XX_TOUCH_AREA + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
 
+                    uint16_t curent_pressure = (uint16_t)(IQS5XX_TOUCH_STRENGTH + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
+
                     ret = iqs5xx_read_reg16(dev, current_reg_abs_x, &point_data[finger_idx].abs_x);
                     if (ret < 0) {
                         goto end_comm;
@@ -126,11 +132,16 @@ static void iqs5xx_work_handler(struct k_work *work) {
                     if (ret < 0) {
                         goto end_comm;
                     }
+                    ret = iqs5xx_read_reg8(dev, curent_pressure, &point_data[finger_idx].pressure);
+                    if (ret < 0) {
+                        goto end_comm;
+                    }
 
                     if(point_data[finger_idx].abs_x!=0 || point_data[finger_idx].abs_y!=0)
                     {   
-                        input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
-                        input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
+                        input_report_abs(dev, INPUT_ABS_MT_POSITION_X, point_data[finger_idx].abs_x, false, K_FOREVER);
+                        input_report_abs(dev, INPUT_ABS_MT_POSITION_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
+                        input_report_abs(dev, INPUT_ABS_MT_PRESSURE, point_data[finger_idx].pressure, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
                     }
                 }

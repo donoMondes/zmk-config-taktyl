@@ -257,5 +257,6 @@ struct iqs5xx_point_data {
     uint8_t id;     //Touch id
     uint16_t abs_x; //Touch absolute position on the x axis
     uint16_t abs_y; //Touch absolute position on the y axis
+    uint16_t pressure;
     uint8_t size;  //Touch area/size
 };
