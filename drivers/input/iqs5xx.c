@@ -103,7 +103,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
     uint16_t addr = TO_LE(IQS5XX_ABS_X);
-    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,35);
+    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,40);
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
         goto end_comm;
@@ -111,7 +111,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
     // Handle movement and gestures.
     if (sys_info_1.tp_movement && !sys_info_1.palm_detect) {
-        for(uint8_t finger_idx = 0; finger_idx<config->max_touch_number;finger_idx++)
+        for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers;finger_idx++)
         {
             if(config->max_touch_number>1)
             {
