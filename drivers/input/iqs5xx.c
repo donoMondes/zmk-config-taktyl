@@ -101,8 +101,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
         goto end_comm;
     }
-
-    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_ABS_X,(uint8_t *)&all_data,sizeof(struct iqs5xx_all_touch_data));
+    ret = i2c_write_read_dt(&config->bus, sys_cpu_to_le16(IQS5XX_ABS_X), sizeof(IQS5XX_ABS_X), (uint8_t *)&all_data, sizeof(struct iqs5xx_all_touch_data));
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
         goto end_comm;
@@ -121,7 +120,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
                     uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_x.h , all_data.touch_points[finger_idx].abs_x.l);
                     uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_y.h , all_data.touch_points[finger_idx].abs_y.l);
 
-                    printf("touch[%u] x : %u, y : %u \n",finger_idx,abs_x,abs_y);
+                    LOG_INF("touch[%u] x : %u, y : %u",finger_idx,abs_x,abs_y);
 
                     if(abs_x!=0 || abs_y!=0)
                     {   
