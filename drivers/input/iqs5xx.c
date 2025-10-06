@@ -13,6 +13,7 @@
 #include <zephyr/input/input.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/byteorder.h>
 
 #include "iqs5xx.h"
 
@@ -101,7 +102,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
         goto end_comm;
     }
-    ret = i2c_write_read_dt(&config->bus, sys_cpu_to_le16(IQS5XX_ABS_X), sizeof(IQS5XX_ABS_X), (uint8_t *)&all_data, sizeof(struct iqs5xx_all_touch_data));
+    ret = i2c_write_read_dt(&config->i2c, sys_cpu_to_le16(IQS5XX_ABS_X), sizeof(IQS5XX_ABS_X), (uint8_t *)&all_data, sizeof(struct iqs5xx_all_touch_data));
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
         goto end_comm;
