@@ -287,9 +287,6 @@ struct iqs5xx_touch {
 
 #pragma pack(1)
 struct iqs5xx_all_touch_data {
-    uint8_t number_of_fingers;
-    struct iqs5xx_xy rel_x;
-    struct iqs5xx_xy rel_y;
     struct iqs5xx_touch touch_points[IQS5XX_INPUT_MAX_TOUCHES];
 };
 

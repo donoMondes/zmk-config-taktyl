@@ -102,7 +102,11 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
 
-    
+    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_ABS_X,(uint8_t *)&all_data,sizeof(struct iqs5xx_all_touch_data));
+    if (ret < 0) {
+        LOG_ERR("Failed to read all touch data: %d", ret);
+        goto end_comm;
+    }
 
     // Handle movement and gestures.
     if (sys_info_1.tp_movement && !sys_info_1.palm_detect) {
@@ -117,7 +121,8 @@ static void iqs5xx_work_handler(struct k_work *work) {
                     uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_x.h , all_data.touch_points[finger_idx].abs_x.l);
                     uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_y.h , all_data.touch_points[finger_idx].abs_y.l);
 
-                printf("touch[%u] x : %u, y : %u \n",finger_idx,abs_x,abs_y);
+                    printf("touch[%u] x : %u, y : %u \n",finger_idx,abs_x,abs_y);
+
                     if(abs_x!=0 || abs_y!=0)
                     {   
                         input_report_abs(dev, INPUT_ABS_X, abs_x, false, K_FOREVER);
