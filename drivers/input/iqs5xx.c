@@ -77,7 +77,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
     iqs5xx_sys_info_0 sys_info_0;
 
     struct iqs5xx_all_touch_data all_data;
-    memset(&all_data,0,sizeof(iqs5xx_all_touch_data));
+    memset(&all_data,0,sizeof(struct iqs5xx_all_touch_data));
 
     int ret;
 
