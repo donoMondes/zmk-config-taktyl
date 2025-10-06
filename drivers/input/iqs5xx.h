@@ -150,6 +150,9 @@
 #define DEFAULT_ZOOM_INITIAL_DISTANCE 0x32 
 #define DEFAULT_ZOOM_CONSECUTIVE_DISTANCE 0x19
 
+#define AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(h, l) ((int16_t)(h << 8) | l)
+#define AZOTEQ_IQS5XX_SWAP_H_L_BYTES(b) ((uint16_t)((b & 0xff) << 8) | (b >> 8))
+
 typedef union {
     uint8_t data;
     struct {
@@ -260,3 +263,28 @@ struct iqs5xx_point_data {
     uint16_t pressure;
     uint8_t size;  //Touch area/size
 };
+
+struct iqs5xx_xy{
+    uint8_t h : 8;
+    uint8_t l : 8;
+};
+
+struct iqs5xx_strength{
+    uint8_t h : 8;
+    uint8_t l : 8;
+};
+
+struct iqs5xx_touch {
+    iqs5xx_xy abs_x; //Touch absolute position on the x axis
+    iqs5xx_xy abs_y; //Touch absolute position on the y axis
+    iqs5xx_strength strength; // Touch strength
+    uint8_t size;  //Touch area/size
+};
+
+struct iqs5xx_all_touch_data {
+    uint8_t number_of_fingers;
+    iqs5xx_xy rel_x;
+    iqs5xx_xy rel_y;
+    iqs5xx_touch touch_points[IQS5XX_INPUT_MAX_TOUCHES];
+};
+

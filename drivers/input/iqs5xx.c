@@ -22,8 +22,6 @@
 
 LOG_MODULE_REGISTER(iqs5xx, CONFIG_INPUT_LOG_LEVEL);
 
-static struct iqs5xx_point_data point_data[IQS5XX_INPUT_MAX_TOUCHES];
-
 static int iqs5xx_read_reg16(const struct device *dev, uint16_t reg, uint16_t *val) {
     const struct iqs5xx_config *config = dev->config;
     uint8_t buf[2];
@@ -78,6 +76,9 @@ static void iqs5xx_work_handler(struct k_work *work) {
     iqs5xx_sys_info_1 sys_info_1;
     iqs5xx_sys_info_0 sys_info_0;
 
+    iqs5xx_all_touch_data data;
+    memset(&data,0,sizeof(iqs5xx_all_touch_data));
+
     int ret;
 
     // Read system info registers.
@@ -101,6 +102,12 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
 
+    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_NUM_FINGERS,(uint8_t *)&data,sizeof(iqs5xx_all_touch_data));
+    if (ret < 0) {
+        LOG_ERR("Failed to read all touch data: %d", ret);
+        goto end_comm;
+    }
+
     // Handle movement and gestures.
     if (sys_info_1.tp_movement && !sys_info_1.palm_detect) {
         for(uint8_t finger_idx = 0; finger_idx<config->max_touch_number;finger_idx++)
@@ -108,39 +115,15 @@ static void iqs5xx_work_handler(struct k_work *work) {
             if(config->max_touch_number>1)
             {
                 // current absolute slot for absolute position
-                point_data[finger_idx].id = finger_idx;
-                input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[finger_idx].id,false,K_FOREVER);
+                input_report_abs(dev,INPUT_ABS_MT_SLOT,finger_idx,false,K_FOREVER);
                 if(finger_idx<config->max_touch_number)
                 {
-                    uint16_t current_reg_abs_x = (uint16_t)(IQS5XX_ABS_X + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
-
-                    uint16_t current_reg_abs_y = (uint16_t)(IQS5XX_ABS_Y + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
-
-                    uint16_t current_size = (uint16_t)(IQS5XX_TOUCH_AREA + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
-
-                    uint16_t curent_pressure = (uint16_t)(IQS5XX_TOUCH_STRENGTH + (finger_idx * IQS5XX_NEXT_TOUCH_OFFSET));
-
-                    ret = iqs5xx_read_reg16(dev, current_reg_abs_x, &point_data[finger_idx].abs_x);
-                    if (ret < 0) {
-                        goto end_comm;
-                    }
-                    ret = iqs5xx_read_reg16(dev, current_reg_abs_y, &point_data[finger_idx].abs_y);
-                    if (ret < 0) {
-                        goto end_comm;
-                    }
-                    ret = iqs5xx_read_reg8(dev, current_size, &point_data[finger_idx].size);
-                    if (ret < 0) {
-                        goto end_comm;
-                    }
-                    ret = iqs5xx_read_reg16(dev, curent_pressure, &point_data[finger_idx].pressure);
-                    if (ret < 0) {
-                        goto end_comm;
-                    }
-
-                    if(point_data[finger_idx].abs_x!=0 || point_data[finger_idx].abs_y!=0)
+                    uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(data.touch_points[finger_idx].abs_x.h , data.touch_points[finger_idx].abs_x.l);
+                    uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(data.touch_points[finger_idx].abs_y.h , data.touch_points[finger_idx].abs_y.l);
+                    if(abs_x!=0 || abs_y!=0)
                     {   
-                        input_report_abs(dev, INPUT_ABS_X, point_data[finger_idx].abs_x, false, K_FOREVER);
-                        input_report_abs(dev, INPUT_ABS_Y, point_data[finger_idx].abs_y, false, K_FOREVER);
+                        input_report_abs(dev, INPUT_ABS_X, abs_x, false, K_FOREVER);
+                        input_report_abs(dev, INPUT_ABS_Y, abs_y, false, K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
                     }
                 }
