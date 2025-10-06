@@ -102,7 +102,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
         goto end_comm;
     }
-    uint16_t addr = TO_LE(IQS5XX_ABS_X);
+    uint16_t addr = TO_LE(IQS5XX_NUM_FINGERS);
     ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,40);
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
