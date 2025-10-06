@@ -102,7 +102,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
 
-    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_NUM_FINGERS,(uint8_t *)&all_data,sizeof(iqs5xx_all_touch_data));
+    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_NUM_FINGERS,(uint8_t *)&all_data,sizeof(struct iqs5xx_all_touch_data));
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
         goto end_comm;
