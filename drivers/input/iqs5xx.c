@@ -76,8 +76,8 @@ static void iqs5xx_work_handler(struct k_work *work) {
     iqs5xx_sys_info_1 sys_info_1;
     iqs5xx_sys_info_0 sys_info_0;
 
-    struct iqs5xx_all_touch_data data;
-    memset(&data,0,sizeof(iqs5xx_all_touch_data));
+    struct iqs5xx_all_touch_data all_data;
+    memset(&all_data,0,sizeof(iqs5xx_all_touch_data));
 
     int ret;
 
@@ -102,7 +102,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         goto end_comm;
     }
 
-    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_NUM_FINGERS,(uint8_t *)&data,sizeof(iqs5xx_all_touch_data));
+    ret = i2c_burst_read_dt(&config->i2c,IQS5XX_NUM_FINGERS,(uint8_t *)&all_data,sizeof(iqs5xx_all_touch_data));
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);
         goto end_comm;
@@ -118,8 +118,8 @@ static void iqs5xx_work_handler(struct k_work *work) {
                 input_report_abs(dev,INPUT_ABS_MT_SLOT,finger_idx,false,K_FOREVER);
                 if(finger_idx<config->max_touch_number)
                 {
-                    uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(data.touch_points[finger_idx].abs_x.h , data.touch_points[finger_idx].abs_x.l);
-                    uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(data.touch_points[finger_idx].abs_y.h , data.touch_points[finger_idx].abs_y.l);
+                    uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_x.h , all_data.touch_points[finger_idx].abs_x.l);
+                    uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_y.h , all_data.touch_points[finger_idx].abs_y.l);
                     if(abs_x!=0 || abs_y!=0)
                     {   
                         input_report_abs(dev, INPUT_ABS_X, abs_x, false, K_FOREVER);
