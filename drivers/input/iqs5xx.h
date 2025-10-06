@@ -152,6 +152,7 @@
 
 #define AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(h, l) ((int16_t)(h << 8) | l)
 #define AZOTEQ_IQS5XX_SWAP_H_L_BYTES(b) ((uint16_t)((b & 0xff) << 8) | (b >> 8))
+#define TO_LE(addr) (addr << 8) | (addr >> 8)
 
 typedef union {
     uint8_t data;
@@ -256,37 +257,32 @@ struct iqs5xx_data {
     int16_t scroll_y_acc;
 };
 
-#pragma pack(1)
 struct iqs5xx_point_data {
     uint8_t id;     //Touch id
     uint16_t abs_x; //Touch absolute position on the x axis
     uint16_t abs_y; //Touch absolute position on the y axis
     uint16_t pressure;
     uint8_t size;  //Touch area/size
-};
+} __packed;
 
-#pragma pack(1)
 struct iqs5xx_xy{
     uint8_t h : 8;
     uint8_t l : 8;
-};
+} __packed;
 
-#pragma pack(1)
 struct iqs5xx_strength{
     uint8_t h : 8;
     uint8_t l : 8;
-};
+} __packed;
 
-#pragma pack(1)
 struct iqs5xx_touch {
     struct iqs5xx_xy abs_x; //Touch absolute position on the x axis
     struct iqs5xx_xy abs_y; //Touch absolute position on the y axis
     struct iqs5xx_strength strength; // Touch strength
     uint8_t size;  //Touch area/size
-};
+} __packed;
 
-#pragma pack(1)
 struct iqs5xx_all_touch_data {
     struct iqs5xx_touch touch_points[IQS5XX_INPUT_MAX_TOUCHES];
-};
+} __packed;
 
