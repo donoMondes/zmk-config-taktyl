@@ -256,6 +256,7 @@ struct iqs5xx_data {
     int16_t scroll_y_acc;
 };
 
+#pragma pack(1)
 struct iqs5xx_point_data {
     uint8_t id;     //Touch id
     uint16_t abs_x; //Touch absolute position on the x axis
@@ -264,16 +265,19 @@ struct iqs5xx_point_data {
     uint8_t size;  //Touch area/size
 };
 
+#pragma pack(1)
 struct iqs5xx_xy{
     uint8_t h : 8;
     uint8_t l : 8;
 };
 
+#pragma pack(1)
 struct iqs5xx_strength{
     uint8_t h : 8;
     uint8_t l : 8;
 };
 
+#pragma pack(1)
 struct iqs5xx_touch {
     struct iqs5xx_xy abs_x; //Touch absolute position on the x axis
     struct iqs5xx_xy abs_y; //Touch absolute position on the y axis
@@ -281,6 +285,7 @@ struct iqs5xx_touch {
     uint8_t size;  //Touch area/size
 };
 
+#pragma pack(1)
 struct iqs5xx_all_touch_data {
     uint8_t number_of_fingers;
     struct iqs5xx_xy rel_x;
