@@ -78,10 +78,10 @@
         palm_rejection;
 
 		resolution_x = <1920>;
-  		resolution_y = <1080>;
+  		resolution_y = <1920>;
 
-        bottom-beta = <5>;
-        stationary-threshold = <5>;
+        bottom-beta = <2>;
+        stationary-threshold = <1>;
 
         switch-xy;
 
