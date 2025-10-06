@@ -276,9 +276,6 @@ struct iqs5xx_strength{
 } __packed;
 
 struct iqs5xx_touch {
-    uint8_t nb_fingers;
-    struct iqs5xx_xy rel_x; //Touch absolute position on the x axis
-    struct iqs5xx_xy rel_y; //Touch absolute position on the y axis
     struct iqs5xx_xy abs_x; //Touch absolute position on the x axis
     struct iqs5xx_xy abs_y; //Touch absolute position on the y axis
     struct iqs5xx_strength strength; // Touch strength
@@ -286,6 +283,9 @@ struct iqs5xx_touch {
 } __packed;
 
 struct iqs5xx_all_touch_data {
+    uint8_t nb_fingers;
+    struct iqs5xx_xy rel_x; //Touch absolute position on the x axis
+    struct iqs5xx_xy rel_y; //Touch absolute position on the y axis
     struct iqs5xx_touch touch_points[IQS5XX_INPUT_MAX_TOUCHES];
 } __packed;
 
