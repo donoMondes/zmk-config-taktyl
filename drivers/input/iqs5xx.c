@@ -76,6 +76,9 @@ static void iqs5xx_work_handler(struct k_work *work) {
     uint16_t addr;
     int ret;
 
+    static uint8_t prev_points;
+    static struct iqs5xx_touch prev_point_data[IQS5XX_INPUT_MAX_TOUCHES];
+
     struct iqs5xx_sys_info sys_info;
     memset(&sys_info,0,sizeof(struct iqs5xx_sys_info));
     struct iqs5xx_all_touch_data all_data;
@@ -128,6 +131,28 @@ static void iqs5xx_work_handler(struct k_work *work) {
             }
         }
     }
+    // for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
+    // {
+    //     /* We look for the prev_point in the current points list */
+	// 	for (finger = 0; finger < all_data.nb_fingers; finger++) {
+	// 		if (prev_finger == finger) 
+    //         {
+	// 			break;
+	// 		}
+    //     }
+	// 	if(finger == all_data.nb_fingers)
+    //     {
+    //         if(config->max_touch_number>1)
+    //         {
+    //             input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
+    //         }
+    //         input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
+    //         input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
+    //         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+    //     }
+    // }
+    memcpy(prev_point_data,all_data.touch_points,sizeof(all_data.touch_points));
+    prev_points = all_data.nb_fingers;
     
 end_comm:
     // End communication window.
@@ -151,8 +176,8 @@ static int iqs5xx_setup_device(const struct device *dev) {
 
     // Change report rate value
     ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_ACTIVE_MODE,config->report_rate_active_mode);
-    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE,config->report_rate_active_mode*2);
-    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_MODE,config->report_rate_active_mode*2);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_TOUCH_MODE,config->report_rate_active_mode*5);
+    ret |= iqs5xx_write_reg16(dev, IQS5XX_REPORT_RATE_IDLE_MODE,config->report_rate_active_mode*5);
 
     // Enable event mode and trackpad events.
     ret |= iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_1,
