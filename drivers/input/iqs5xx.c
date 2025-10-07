@@ -108,7 +108,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
     // Handle movement and gestures.
     if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
-        for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers;finger_idx++)
+        for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers; finger_idx++)
         {
             if(config->max_touch_number>1)
             {
@@ -131,27 +131,17 @@ static void iqs5xx_work_handler(struct k_work *work) {
             }
         }
     }
-    // for(prev_finger = 0; prev_finger < prev_points ; prev_finger++)
-    // {
-    //     /* We look for the prev_point in the current points list */
-	// 	for (finger = 0; finger < all_data.nb_fingers; finger++) {
-	// 		if (prev_finger == finger) 
-    //         {
-	// 			break;
-	// 		}
-    //     }
-	// 	if(finger == all_data.nb_fingers)
-    //     {
-    //         if(config->max_touch_number>1)
-    //         {
-    //             input_report_abs(dev,INPUT_ABS_MT_SLOT,point_data[prev_finger].id,true,K_FOREVER);
-    //         }
-    //         input_report_abs(dev, INPUT_ABS_X, prev_point_data[prev_finger].abs_x, false, K_FOREVER);
-    //         input_report_abs(dev, INPUT_ABS_Y, prev_point_data[prev_finger].abs_y, false, K_FOREVER);
-    //         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-    //     }
-    // }
-    memcpy(prev_point_data,all_data.touch_points,sizeof(all_data.touch_points));
+
+    if(prev_points > all_data.nb_fingers)
+    {
+        for(prev_finger = all_data.nb_fingers; prev_finger < config->max_touch_number; prev_finger++)
+        {
+            //remove old point 
+            input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger-1,false,K_FOREVER);
+            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+        }
+    }
+    //memcpy(prev_point_data,all_data.touch_points,sizeof(all_data.touch_points));
     prev_points = all_data.nb_fingers;
     
 end_comm:
