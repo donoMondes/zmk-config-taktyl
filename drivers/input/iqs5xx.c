@@ -73,36 +73,30 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
     uint8_t prev_finger;
     uint8_t finger;
+    uint16_t addr;
+    int ret;
 
-    iqs5xx_sys_info_1 sys_info_1;
-    iqs5xx_sys_info_0 sys_info_0;
-
+    struct iqs5xx_sys_info sys_info;
+    memset(&sys_info,0,sizeof(struct iqs5xx_sys_info));
     struct iqs5xx_all_touch_data all_data;
     memset(&all_data,0,sizeof(struct iqs5xx_all_touch_data));
 
-    int ret;
-
+    addr = TO_LE(IQS5XX_SYSTEM_INFO_0);
     // Read system info registers.
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_0, &sys_info_0.data);
+    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&sys_info,2);
     if (ret < 0) {
-        LOG_ERR("Failed to read system info 0: %d", ret);
-        goto end_comm;
-    }
-
-    ret = iqs5xx_read_reg8(dev, IQS5XX_SYSTEM_INFO_1, &sys_info_1.data);
-    if (ret < 0) {
-        LOG_ERR("Failed to read system info 1: %d", ret);
+        LOG_ERR("Failed to read sys_info: %d", ret);
         goto end_comm;
     }
 
     // Handle reset indication.
-    if (sys_info_0.show_reset) {
+    if (sys_info.sys_info_0.show_reset) {
         LOG_INF("Device reset detected");
         // Acknowledge reset.
         iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
         goto end_comm;
     }
-    uint16_t addr = TO_LE(IQS5XX_NUM_FINGERS);
+    addr = TO_LE(IQS5XX_NUM_FINGERS);
     ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,40);
     if (ret < 0) {
         LOG_ERR("Failed to read all touch data: %d", ret);

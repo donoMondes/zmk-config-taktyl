@@ -179,6 +179,11 @@ typedef union {
     };
 }iqs5xx_sys_info_0;
 
+struct iqs5xx_sys_info {
+    struct iqs5xx_sys_info_0 sys_info_0;
+    struct iqs5xx_sys_info_1 sys_info_1;
+} __packed;
+
 typedef union {
     uint8_t data;
     struct {
