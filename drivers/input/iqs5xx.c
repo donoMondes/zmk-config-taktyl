@@ -132,7 +132,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
     if(prev_points > all_data.nb_fingers)
     {
-        for(prev_finger = all_data.nb_fingers; prev_finger < config->max_touch_number; prev_finger++)
+        for(prev_finger = all_data.nb_fingers; prev_finger <= config->max_touch_number; prev_finger++)
         {
             //remove old point 
             LOG_INF("removing point [%u] ",prev_finger);
