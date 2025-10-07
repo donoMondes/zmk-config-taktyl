@@ -72,12 +72,10 @@ static void iqs5xx_work_handler(struct k_work *work) {
     const struct iqs5xx_config *config = dev->config;
 
     uint8_t prev_finger;
-    uint8_t finger;
     uint16_t addr;
     int ret;
 
     static uint8_t prev_points;
-    static struct iqs5xx_touch prev_point_data[IQS5XX_INPUT_MAX_TOUCHES];
 
     struct iqs5xx_sys_info sys_info;
     memset(&sys_info,0,sizeof(struct iqs5xx_sys_info));
@@ -137,11 +135,11 @@ static void iqs5xx_work_handler(struct k_work *work) {
         for(prev_finger = all_data.nb_fingers; prev_finger < config->max_touch_number; prev_finger++)
         {
             //remove old point 
+            LOG_INF("removing point [%u] ",prev_finger);
             input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger-1,false,K_FOREVER);
             input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
         }
     }
-    //memcpy(prev_point_data,all_data.touch_points,sizeof(all_data.touch_points));
     prev_points = all_data.nb_fingers;
     
 end_comm:
