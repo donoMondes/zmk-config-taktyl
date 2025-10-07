@@ -104,7 +104,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
     }
 
     // Handle movement and gestures.
-    if (sys_info_1.tp_movement && !sys_info_1.palm_detect) {
+    if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
         for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers;finger_idx++)
         {
             if(config->max_touch_number>1)
