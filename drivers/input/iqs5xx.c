@@ -252,14 +252,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
         LOG_ERR("Failed to configure timing gesture settings: %d", ret);
         return ret;
     }
-
-    uint8_t multiplier = 16;
-    ret = iqs5xx_write_reg8(dev, IQS5XX_GL_TOUCH_MULTIPLIER, &multiplier);
-    if (ret < 0) {
-        LOG_ERR("Failed to configure global touch multiplier: %d", ret);
-        return ret;
-    }
-
+    
     // Configure axes.
     uint8_t xy_config = 0;
     xy_config |= config->flip_x ? IQS5XX_FLIP_X : 0;
