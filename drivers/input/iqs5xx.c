@@ -253,7 +253,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
         return ret;
     }
 
-    uint8_t multiplier = 24;
+    uint8_t multiplier = 16;
     ret = iqs5xx_write_reg8(dev, IQS5XX_GL_TOUCH_MULTIPLIER, &multiplier);
     if (ret < 0) {
         LOG_ERR("Failed to configure global touch multiplier: %d", ret);
