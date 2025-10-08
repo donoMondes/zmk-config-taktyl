@@ -252,7 +252,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
         LOG_ERR("Failed to configure timing gesture settings: %d", ret);
         return ret;
     }
-
+    
     // Configure axes.
     uint8_t xy_config = 0;
     xy_config |= config->flip_x ? IQS5XX_FLIP_X : 0;
@@ -266,7 +266,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
     }
 
     // Configure system settings.
-    ret = iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_0, IQS5XX_SETUP_COMPLETE | IQS5XX_WDT);
+    ret = iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_0, IQS5XX_SETUP_COMPLETE | IQS5XX_WDT | IQS5XX_REATI);
     if (ret < 0) {
         LOG_ERR("Failed to configure system: %d", ret);
         return ret;
