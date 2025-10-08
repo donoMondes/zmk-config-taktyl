@@ -89,6 +89,13 @@ static void iqs5xx_work_handler(struct k_work *work) {
         LOG_ERR("Failed to read sys_info: %d", ret);
         goto end_comm;
     }
+    uint8_t multiplier;
+    ret = iqs5xx_read_reg8(dev, IQS5XX_GL_TOUCH_MULTIPLIER, &multiplier);
+    if (ret < 0) {
+        LOG_ERR("Failed to read global touch multiplier: %d", ret);
+        goto end_comm;
+    }
+    LOG_INF("global touch multiplier %u",multiplier);
 
     // Handle reset indication.
     if (sys_info.sys_info_0.show_reset) {

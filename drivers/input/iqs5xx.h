@@ -54,6 +54,7 @@
 #define IQS5XX_TOUCH_EVENT BIT(6)
 #define IQS5XX_PROX_EVENT BIT(7)
 
+#define IQS5XX_GL_TOUCH_MULTIPLIER 0x0596
 // Filter settings register.
 #define IQS5XX_FILTER_SETTINGS 0x0632
 // Filter settings bits.
