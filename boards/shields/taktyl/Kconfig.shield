@@ -1,8 +1,8 @@
 # Copyright (c) 2024 Pete Johanson
 # SPDX-License-Identifier: MIT
 
-config SHIELD_PEACOCK_VIK_MODULE
-	def_bool $(shields_list_contains,peacock_vik_module)
+config SHIELD_TAKTYL
+	def_bool $(shields_list_contains,taktyl)
 	imply ZMK_MOUSE
 	imply ZMK_TRACKPAD
 	select I2C
