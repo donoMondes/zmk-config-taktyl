@@ -1,4 +1,10 @@
-if SHIELD_TAKTYL
+if SHIELD_TAKTYL_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "TakTyl"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+	default y
 
 if ZMK_TRACKPAD
 
@@ -16,4 +22,11 @@ config ZMK_TRACKPAD_PHYSICAL_Y
 
 endif # ZMK_TRACKPAD
 
-endif # SHIELD_TAKTYL
+endif # SHIELD_TAKTYL_RIGHT
+
+if SHIELD_TAKTYL_LEFT || SHIELD_TAKTYL_RIGHT
+
+config ZMK_SPLIT
+	default y
+
+endif
