@@ -3,9 +3,6 @@ if SHIELD_TAKTYL_RIGHT
 config ZMK_KEYBOARD_NAME
     default "TakTyl"
 
-config ZMK_SPLIT_ROLE_CENTRAL
-	default y
-
 if ZMK_TRACKPAD
 
 config ZMK_TRACKPAD_LOGICAL_X
