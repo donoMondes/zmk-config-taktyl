@@ -44,15 +44,15 @@
         >;
     };
 
-    trackpad_listener {
+    /*trackpad_listener {
 		compatible = "zmk,input-listener";
 		mode = "trackpad";
 		device = <&trackpad>;
-	};
+	};*/
 
 };
 
-&pro_micro_i2c {
+/*&pro_micro_i2c {
 	status = "okay";
 
 	trackpad: iqs5xx@74 {
@@ -81,4 +81,4 @@
         reset-gpios = <&pro_micro 18 GPIO_ACTIVE_LOW>; /* P0.10 */
         rdy-gpios = <&pro_micro 19 GPIO_ACTIVE_HIGH>; /* P1.11 */
     };
-};
+};*/
