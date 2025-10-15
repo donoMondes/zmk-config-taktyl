@@ -1,5 +1,5 @@
-# Copyright (c) 2024 Pete Johanson
-# SPDX-License-Identifier: MIT
+config SHIELD_TAKTYL_LEFT
+	def_bool $(shields_list_contains,taktyl_left)
 
 config SHIELD_TAKTYL_RIGHT
 	def_bool $(shields_list_contains,taktyl_right)
@@ -7,5 +7,3 @@ config SHIELD_TAKTYL_RIGHT
 #	imply ZMK_TRACKPAD
 #	select I2C
 
-config SHIELD_TAKTYL_LEFT
-	def_bool $(shields_list_contains,taktyl_left)
