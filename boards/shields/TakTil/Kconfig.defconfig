@@ -1,6 +1,0 @@
-if SHIELD_TAKTIL
-
-config ZMK_KEYBOARD_NAME
-    default "TakTil"
-
-endif # SHIELD_TAKTIL
