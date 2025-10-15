@@ -1,4 +1,4 @@
-if SHIELD_TAKTYL_LEFT
+if SHIELD_TAKTYL_RIGHT
 
 config ZMK_KEYBOARD_NAME
     default "TakTyl"
@@ -6,27 +6,23 @@ config ZMK_KEYBOARD_NAME
 config ZMK_SPLIT_ROLE_CENTRAL
 	default y
 
+if ZMK_TRACKPAD
+
+config ZMK_TRACKPAD_LOGICAL_X
+	default 3072
+
+config ZMK_TRACKPAD_LOGICAL_Y
+	default 2048
+
+config ZMK_TRACKPAD_PHYSICAL_X
+	default 3072
+
+config ZMK_TRACKPAD_PHYSICAL_Y
+	default 2048
+
 endif 
 
-#if SHIELD_TAKTYL_RIGHT
-#
-#if ZMK_TRACKPAD
-#
-#config ZMK_TRACKPAD_LOGICAL_X
-#	default 3072
-#
-#config ZMK_TRACKPAD_LOGICAL_Y
-#	default 2048
-#
-#config ZMK_TRACKPAD_PHYSICAL_X
-#	default 3072
-#
-#config ZMK_TRACKPAD_PHYSICAL_Y
-#	default 2048
-#
-#endif 
-#
-#endif 
+endif 
 
 if SHIELD_TAKTYL_LEFT || SHIELD_TAKTYL_RIGHT
 

@@ -3,7 +3,7 @@ config SHIELD_TAKTYL_LEFT
 
 config SHIELD_TAKTYL_RIGHT
 	def_bool $(shields_list_contains,taktyl_right)
-#	imply ZMK_MOUSE
-#	imply ZMK_TRACKPAD
-#	select I2C
+	imply ZMK_MOUSE
+	imply ZMK_TRACKPAD
+	select I2C
 
