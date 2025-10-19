@@ -9,7 +9,6 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/input/input.h>
-#include <zmk/keymap.h>
 #include <stdlib.h> //for abs()
 #include <zephyr/sys/util.h> // for CLAMP
 
