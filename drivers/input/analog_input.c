@@ -15,7 +15,7 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(ANALOG_INPUT, CONFIG_ANALOG_INPUT_LOG_LEVEL);
 
-#include <zmk/drivers/analog_input.h>
+#include "analog_input.h"
 
 static int analog_input_report_data(const struct device *dev) {
     struct analog_input_data *data = dev->data;
