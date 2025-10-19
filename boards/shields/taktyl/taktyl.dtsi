@@ -44,11 +44,8 @@
     };
 };
 
-
-&adc {
-	status = "okay";
-
-    anin0: analog_input_0 {
+/ {
+	anin0: analog_input_0 {
 		compatible = "zmk,analog-input";
 		sampling-hz = <50>;
 		x-ch {
@@ -79,6 +76,10 @@
 
 		};
 	};
+};
+
+&adc {
+	status = "okay";
 };
 
 &pro_micro_i2c {
