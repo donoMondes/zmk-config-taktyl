@@ -42,7 +42,6 @@
     split_inputs {
         joystick_split: joystick_split@0 {
             compatible = "zmk,input-split";
-            reg = <0>;
         };
     };
 
