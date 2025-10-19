@@ -42,12 +42,13 @@
     split_inputs {
         joystick_split: joystick_split@0 {
             compatible = "zmk,input-split";
+            reg = <0>;
         };
     };
 
     joystick_listener: joystick_listener {
         compatible = "zmk,input-listener";
-        status = "okay";
+        status = "disabled";
         device = <&joystick_split>;
     };
 };
