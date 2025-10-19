@@ -53,6 +53,7 @@
 
 / {
     joystick_listener {
+        status = "okay";
         compatible = "zmk,input-listener";
         device = <&anin0>;
     };
