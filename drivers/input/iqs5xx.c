@@ -65,62 +65,65 @@ static void iqs5xx_work_handler(struct k_work *work) {
     ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&sys_info,2);
     if (ret < 0) {
         LOG_ERR("Failed to read sys_info: %d", ret);
-        goto end_comm;
     }
-
-    // Handle reset indication.
-    if (sys_info.sys_info_0.show_reset) {
-        LOG_INF("Device reset detected");
-        // Acknowledge reset.
-        iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
-        goto end_comm;
-    }
-    addr = TO_LE(IQS5XX_NUM_FINGERS);
-    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,40);
-    if (ret < 0) {
-        LOG_ERR("Failed to read all touch data: %d", ret);
-        goto end_comm;
-    }
-
-    // Handle movement and gestures.
-    if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
-        for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers; finger_idx++)
+    else
+    {
+        // Handle reset indication.
+        if (sys_info.sys_info_0.show_reset) {
+            LOG_INF("Device reset detected");
+            // Acknowledge reset.
+            iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
+        }
+        else
         {
-            if(config->max_touch_number>1)
+            addr = TO_LE(IQS5XX_NUM_FINGERS);
+            ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,40);
+            if (ret < 0) {
+                LOG_ERR("Failed to read all touch data: %d", ret);
+            }
+            else
             {
-                // current absolute slot for absolute position
-                input_report_abs(dev,INPUT_ABS_MT_SLOT,finger_idx,false,K_FOREVER);
-                if(finger_idx<config->max_touch_number)
-                {
-                    uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_x.h , all_data.touch_points[finger_idx].abs_x.l);
-                    uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_y.h , all_data.touch_points[finger_idx].abs_y.l);
-
-                    LOG_INF("touch[%u] x : %u, y : %u",finger_idx,abs_x,abs_y);
-
-                    if(abs_x!=0 || abs_y!=0)
-                    {   
-                        input_report_abs(dev, INPUT_ABS_X, abs_x, false, K_FOREVER);
-                        input_report_abs(dev, INPUT_ABS_Y, abs_y, false, K_FOREVER);
-                        input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
+                // Handle movement and gestures.
+                if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
+                    for(uint8_t finger_idx = 0; finger_idx<all_data.nb_fingers; finger_idx++)
+                    {
+                        if(config->max_touch_number>1)
+                        {
+                            // current absolute slot for absolute position
+                            input_report_abs(dev,INPUT_ABS_MT_SLOT,finger_idx,false,K_FOREVER);
+                            if(finger_idx<config->max_touch_number)
+                            {
+                                uint16_t abs_x = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_x.h , all_data.touch_points[finger_idx].abs_x.l);
+                                uint16_t abs_y = (uint16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(all_data.touch_points[finger_idx].abs_y.h , all_data.touch_points[finger_idx].abs_y.l);
+            
+                                LOG_INF("touch[%u] x : %u, y : %u",finger_idx,abs_x,abs_y);
+            
+                                if(abs_x!=0 || abs_y!=0)
+                                {   
+                                    input_report_abs(dev, INPUT_ABS_X, abs_x, false, K_FOREVER);
+                                    input_report_abs(dev, INPUT_ABS_Y, abs_y, false, K_FOREVER);
+                                    input_report_key(dev, INPUT_BTN_TOUCH, 1, true, K_FOREVER);
+                                }
+                            }
+                        }
                     }
                 }
+            
+                if(prev_points > all_data.nb_fingers)
+                {
+                    for(prev_finger = all_data.nb_fingers; prev_finger <= config->max_touch_number; prev_finger++)
+                    {
+                        //remove old point 
+                        LOG_INF("removing point [%u] ",prev_finger);
+                        input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger,false,K_FOREVER);
+                        input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
+                    }
+                }
+                prev_points = all_data.nb_fingers;
             }
         }
     }
-
-    if(prev_points > all_data.nb_fingers)
-    {
-        for(prev_finger = all_data.nb_fingers; prev_finger <= config->max_touch_number; prev_finger++)
-        {
-            //remove old point 
-            LOG_INF("removing point [%u] ",prev_finger);
-            input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger-1,false,K_FOREVER);
-            input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
-        }
-    }
-    prev_points = all_data.nb_fingers;
     
-end_comm:
     // End communication window.
     iqs5xx_end_comm_window(dev);
 }
