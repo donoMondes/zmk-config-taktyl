@@ -67,6 +67,7 @@ static int analog_input_report_data(const struct device *dev) {
         int32_t raw = data->as_buff[i];
         int32_t mv = raw;
         adc_raw_to_millivolts(adc_ref_internal(adc), ADC_GAIN_1_6, as->resolution, &mv);
+        LOG_INF("AIN%u raw: %d mv: %d", ch_cfg.adc_channel.channel_id, raw, mv);
 #if IS_ENABLED(CONFIG_ANALOG_INPUT_LOG_INF_RAW)
         LOG_INF("AIN%u raw: %d mv: %d", ch_cfg.adc_channel.channel_id, raw, mv);
 #endif
