@@ -149,30 +149,25 @@ static int analog_input_report_data(const struct device *dev) {
 #if IS_ENABLED(CONFIG_ANALOG_INPUT_LOG_INF_REPORT)
             LOG_INF("input_report %u rv: %d  e:%d  c:%d", i, dv, ch_cfg.evt_type, ch_cfg.input_code);
 #endif
-            if(i == 0)
-            {
-                if(dv>0)
-                {
+        
+            if(i == 0) {
+                if(dv>0) {
                     input_report_key(dev,INPUT_KEY_RIGHT,1,i == idx_to_sync,K_NO_WAIT);
                 }
-                else
-                {
+                else {
                     input_report_key(dev,INPUT_KEY_LEFT,1,i == idx_to_sync,K_NO_WAIT);
                 }
-                
             }
-            else
-            {
-                if(dv>0)
-                {
+            else {
+                if(dv>0) {
                     input_report_key(dev,INPUT_KEY_UP,1,i == idx_to_sync,K_NO_WAIT);
                 }
-                else
-                {
+                else {
                     input_report_key(dev,INPUT_KEY_DOWN,1,i == idx_to_sync,K_NO_WAIT);    
                 }
-                //input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync, K_NO_WAIT);
             }
+        //input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync, K_NO_WAIT);
+        }
     }
     return 0;
 }
