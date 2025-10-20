@@ -67,11 +67,6 @@ static int analog_input_report_data(const struct device *dev) {
         int32_t raw = data->as_buff[i];
         int32_t mv = raw;
         adc_raw_to_millivolts(adc_ref_internal(adc), ADC_GAIN_1_6, as->resolution, &mv);
-        LOG_INF("AIN%u raw: %d mv: %d", ch_cfg.adc_channel.channel_id, raw, mv);
-#if IS_ENABLED(CONFIG_ANALOG_INPUT_LOG_INF_RAW)
-        LOG_INF("AIN%u raw: %d mv: %d", ch_cfg.adc_channel.channel_id, raw, mv);
-#endif
-
         int16_t v = mv - ch_cfg.mv_mid;
         int16_t dz = ch_cfg.mv_deadzone;
         if (dz) {
@@ -154,8 +149,30 @@ static int analog_input_report_data(const struct device *dev) {
 #if IS_ENABLED(CONFIG_ANALOG_INPUT_LOG_INF_REPORT)
             LOG_INF("input_report %u rv: %d  e:%d  c:%d", i, dv, ch_cfg.evt_type, ch_cfg.input_code);
 #endif
-            input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync, K_NO_WAIT);
-        }
+            if(i == 0)
+            {
+                if(dv>0)
+                {
+                    input_report_key(dev,INPUT_KEY_RIGHT,1,i == idx_to_sync,K_NO_WAIT);
+                }
+                else
+                {
+                    input_report_key(dev,INPUT_KEY_LEFT,1,i == idx_to_sync,K_NO_WAIT);
+                }
+                
+            }
+            else
+            {
+                if(v>0)
+                {
+                    input_report_key(dev,INPUT_KEY_UP,1,i == idx_to_sync,K_NO_WAIT);
+                }
+                else
+                {
+                    input_report_key(dev,INPUT_KEY_DOWN,1,i == idx_to_sync,K_NO_WAIT);    
+                }
+                //input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync, K_NO_WAIT);
+            }
     }
     return 0;
 }

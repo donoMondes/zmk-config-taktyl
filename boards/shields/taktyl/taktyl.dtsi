@@ -51,9 +51,9 @@
 		sampling-hz = <10>;
 		x-ch {
 			io-channels = <&adc 7>; // <--- see ain-map.png for nRF52840
-			mv-mid = <1770>;
+			mv-mid = <1630>;
 			mv-min-max = <1600>;
-			mv-deadzone = <20>;
+			mv-deadzone = <100>;
 			scale-multiplier = <1>;
 			scale-divisor = <200>;
             invert;
@@ -64,7 +64,7 @@
 			io-channels = <&adc 5>; // <--- see ain-map.png for nRF52840
 			mv-mid = <1630>;
 			mv-min-max = <1600>;
-			mv-deadzone = <20>;
+			mv-deadzone = <100>;
 			scale-multiplier = <1>;
 			scale-divisor = <200>;
 			invert;
@@ -74,7 +74,7 @@
 			/* enable report mdoe for gamepad axix or knob */
 			/* to only call input_report on quantquantized value is updated */
 			/* NOTE: mouse input does NOT need this */
-			// report-on-change-only;
+			report-on-change-only;
 
 		};
 	};
