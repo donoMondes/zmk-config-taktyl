@@ -88,7 +88,6 @@ static int analog_input_report_data(const struct device *dev) {
         }
 
         if (ch_cfg.invert) v *= -1;
-        v = (int16_t)((v * ch_cfg.scale_multiplier) / ch_cfg.scale_divisor);
 
         if (ch_cfg.report_on_change_only) {
             // track raw value to compare until next report interval
