@@ -38,11 +38,11 @@
 		device = <&trackpad>;
 	};    
 
-    //joystick_listener: joystick_listener {
-    //    compatible = "zmk,input-listener";
-    //    status = "okay";
-    //    device = <&anin0>;
-    //};
+    joystick_listener: joystick_listener {
+        compatible = "zmk,input-listener";
+        status = "okay";
+        device = <&anin0>;
+    };
 };
 
 / {
