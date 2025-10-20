@@ -163,7 +163,7 @@ static int analog_input_report_data(const struct device *dev) {
             }
             else
             {
-                if(v>0)
+                if(dv>0)
                 {
                     input_report_key(dev,INPUT_KEY_UP,1,i == idx_to_sync,K_NO_WAIT);
                 }
