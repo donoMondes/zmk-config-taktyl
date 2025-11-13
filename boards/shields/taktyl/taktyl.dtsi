@@ -75,7 +75,6 @@
     };
 };
 
-#include <dt-bindings/zmk/keys.h>
 / {
     input_processors {
         joystick_arrow: joystick_arrow {
