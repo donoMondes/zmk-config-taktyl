@@ -35,7 +35,8 @@
     trackpad_listener {
 		compatible = "zmk,input-listener";
 		mode = "trackpad";
-		device = <&trackpad>;	};    
+		device = <&trackpad>;	
+    };    
 
     joystick_listener: joystick_listener {
         compatible = "zmk,input-listener";
@@ -75,12 +76,13 @@
     };
 };
 
-#include <dt-bindings/zmk/keys.h>
 / {
-    joystick_arrow: joystick_arrow {
-        compatible = "zmk,input-processor-behaviors";
-        #input-processor-cells = <0>;
-        codes    = <INPUT_KEY_RIGHT>;
-        bindings = <&kp RIGHT>;
+    input_processors {
+        joystick_arrow: joystick_arrow {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes    = < INPUT_KEY_RIGHT >;
+            bindings = < &kp RIGHT >;
+        };
     };
 };
