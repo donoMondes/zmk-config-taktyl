@@ -1,5 +1,5 @@
 #include <dt-bindings/zmk/matrix_transform.h>
-#include <dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 / {
     chosen {
@@ -35,18 +35,7 @@
     trackpad_listener {
 		compatible = "zmk,input-listener";
 		mode = "trackpad";
-		device = <&trackpad>;
-	};    
-
-#include <dt-bindings/zmk/keys.h>
-    input_processors {
-        joystick_arrow: joystick_arrow {
-            compatible = "zmk,input-processor-behaviors";
-            #input-processor-cells = <0>;
-            codes    = < INPUT_KEY_RIGHT >;
-            bindings = < &kp RIGHT >;
-        };
-    };
+		device = <&trackpad>;	};    
 
     joystick_listener: joystick_listener {
         compatible = "zmk,input-listener";
@@ -86,3 +75,14 @@
     };
 };
 
+#include <dt-bindings/zmk/keys.h>
+/ {
+    input_processors {
+        joystick_arrow: joystick_arrow {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes    = < INPUT_KEY_RIGHT >;
+            bindings = < &kp RIGHT >;
+        };
+    };
+};
