@@ -42,6 +42,7 @@
         compatible = "zmk,input-listener";
         status = "okay";
         device = <&anin0>;
+        input-processors = <&joystick_arrow>;
     };
 };
 
