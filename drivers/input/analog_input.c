@@ -153,17 +153,21 @@ static int analog_input_report_data(const struct device *dev) {
             if(i == 0) {
                 if(dv>0) {
                     input_report_key(dev,INPUT_KEY_RIGHT,1,i == idx_to_sync,K_NO_WAIT);
+                    LOG_INF("input_key_right");
                 }
                 else {
                     input_report_key(dev,INPUT_KEY_LEFT,1,i == idx_to_sync,K_NO_WAIT);
+                    LOG_INF("input_key_left");
                 }
             }
             else {
                 if(dv>0) {
                     input_report_key(dev,INPUT_KEY_UP,1,i == idx_to_sync,K_NO_WAIT);
+                    LOG_INF("input_key_up");
                 }
                 else {
-                    input_report_key(dev,INPUT_KEY_DOWN,1,i == idx_to_sync,K_NO_WAIT);    
+                    input_report_key(dev,INPUT_KEY_DOWN,1,i == idx_to_sync,K_NO_WAIT);
+                    LOG_INF("input_key_left");    
                 }
             }
         //input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync, K_NO_WAIT);

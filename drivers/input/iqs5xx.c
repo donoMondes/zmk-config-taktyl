@@ -115,7 +115,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
                     {
                         //remove old point 
                         LOG_INF("removing point [%u] ",prev_finger);
-                        input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger,false,K_FOREVER);
+                        input_report_abs(dev,INPUT_ABS_MT_SLOT,prev_finger-1,false,K_FOREVER);
                         input_report_key(dev, INPUT_BTN_TOUCH, 0, true, K_FOREVER);
                     }
                 }
