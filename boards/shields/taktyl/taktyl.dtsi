@@ -1,5 +1,7 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <dt-bindings/input/input-event-codes.h>
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
 
 / {
     chosen {
@@ -42,8 +44,8 @@
         joystick_arrow: joystick_arrow {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
-            codes    = <INPUT_KEY_RIGHT INPUT_KEY_LEFT INPUT_KEY_UP INPUT_KEY_DOWN> ;
-            bindings = <&kp RIGHT &kp LEFT &kp UP &kp DOWN>;
+            codes    = < INPUT_KEY_RIGHT >;
+            bindings = < &kp RIGHT >;
         };
     };
 
