@@ -40,7 +40,6 @@
     joystick_listener: joystick_listener {
         compatible = "zmk,input-listener";
         status = "disabled";
-        input-processors = <&joystick_arrow>;
     };
 };
 
@@ -72,18 +71,5 @@
 
         reset-gpios = <&pro_micro 18 GPIO_ACTIVE_LOW>; /* P0.10 */
         rdy-gpios = <&pro_micro 19 GPIO_ACTIVE_HIGH>; /* P1.11 */
-    };
-};
-
-#include <dt-bindings/zmk/keys.h>
-
-/ {
-    input_processors {
-        joystick_arrow: joystick_arrow {
-            compatible = "zmk,input-processor-behaviors";
-            #input-processor-cells = <0>;
-            codes    = < INPUT_KEY_RIGHT >;
-            bindings = < &kp RIGHT >;
-        };
     };
 };
