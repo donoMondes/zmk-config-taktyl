@@ -43,14 +43,18 @@
         input-processors = <&joystick_arrow>;
     };
 };
+
 #include <dt-bindings/zmk/keys.h>
 / {
     input_processors {
         joystick_arrow: joystick_arrow {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
-            codes    = < INPUT_KEY_RIGHT >;
-            bindings = < &kp RIGHT >;
+            codes    = <INPUT_KEY_RIGHT INPUT_KEY_LEFT INPUT_KEY_UP INPUT_KEY_DOWN>;
+            bindings = <&kp RIGHT>,
+                       <&kp LEFT>,
+                       <&kp UP>,
+                       <&kp DOWN>;
         };
     };
 };
