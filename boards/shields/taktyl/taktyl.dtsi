@@ -40,6 +40,18 @@
     joystick_listener: joystick_listener {
         compatible = "zmk,input-listener";
         status = "disabled";
+        input-processors = <&joystick_arrow>;
+    };
+};
+
+/ {
+    input_processors {
+        joystick_arrow: joystick_arrow {
+            compatible = "zmk,input-processor-behaviors";
+            #input-processor-cells = <0>;
+            codes    = < INPUT_KEY_RIGHT >;
+            bindings = < &kp RIGHT >;
+        };
     };
 };
 
