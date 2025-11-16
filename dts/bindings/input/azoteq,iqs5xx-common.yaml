@@ -48,40 +48,6 @@ properties:
     type: boolean
     description: "Invert the direction of the y axis"
 
-  report_rate_active_mode:
-    type: int
-    description: "report rate for the active mode in ms (refer to the IQS5xx datasheet)"
-    default: 5
-
-  palm_rejection:
-    type: boolean
-    description: "Activate the palm reject function"
-
-  palm_reject_threshold:
-    type: int
-    description: "Area size for the palm reject activation"
-    default: 100
-
-  palm_reject_timeout:
-    type: int
-    description: "Timeout to deactivate palm reject (multiple of 32 ms)"
-    default : 4
-
-  max_touch_number:
-    type: int
-    description: "Value between 1 and 5 for the maximum number of finger points"
-    default: 5
-
-  resolution_x:
-    type: int
-    description: "Resolution value for the x axis"
-    default: 3072
-
-  resolution_y:
-    type: int
-    description: "Resolution value for the y axis"
-    default: 2048
-
   bottom-beta:
     type: int
     description: |
