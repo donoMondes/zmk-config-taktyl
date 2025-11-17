@@ -37,7 +37,7 @@
 		compatible = "zmk,input-listener";
         status = "disabled";
 		device = <&trackpad>;	
-        input-processors = <&&zip_xy_scaler 3 2>
+        input-processors = <&&zip_xy_scaler 3 2>;
     };    
 
     joystick_listener: joystick_listener {
