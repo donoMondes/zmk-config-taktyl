@@ -17,7 +17,7 @@
         direct {
             kscan = <&kscan2>;
             row-offset = <4>;
-        }
+        };
     };
 
     kscan1: kscan_matrix {
