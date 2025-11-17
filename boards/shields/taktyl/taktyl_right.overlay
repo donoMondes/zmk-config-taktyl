@@ -50,3 +50,11 @@
     status = "okay";
     device = <&anin0>;
 };
+
+&trackpad {
+	status = "okay";
+};
+
+&trackpad_listener {
+	status = "okay";	
+};  

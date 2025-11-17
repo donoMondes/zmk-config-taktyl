@@ -4,6 +4,10 @@ manifest:
       url-base: https://github.com/donoMondes/
     - name: petejohanson
       url-base: https://github.com/petejohanson
+    - name: process_keybinds
+      url-base: https://github.com/te9no
+    - name: badjeff
+      url-base: https://github.com/badjeff
     # Additional modules containing boards/shields/custom code can be listed here as well
     # See https://docs.zephyrproject.org/3.2.0/develop/west/manifest.html#projects
   projects:
@@ -11,5 +15,11 @@ manifest:
       remote: zmkfirmware
       revision: adc-enable
       import: app/west.yml
+    - name: zmk-input-processor-keybind
+      remote: process_keybinds
+      revision: main
+    - name: zmk-analog-input-driver
+      remote: badjeff
+      revision: main
   self:
     path: config
