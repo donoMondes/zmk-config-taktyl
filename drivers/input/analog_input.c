@@ -77,6 +77,7 @@ static int analog_input_report_data(const struct device *dev) {
                 if (v > -dz) v = 0; else v += dz;
             }
         }
+        LOG_INF("analog_input_report %u v: %d dz:%d", i, v, dz);
         uint16_t mm = ch_cfg.mv_min_max;
         if (mm) {
             if (v > 0 && v > mm) v = mm;
@@ -145,10 +146,6 @@ static int analog_input_report_data(const struct device *dev) {
             if (ch_cfg.report_on_change_only) {
                 data->prev[i] = dv;
             }
-
-#if IS_ENABLED(CONFIG_ANALOG_INPUT_LOG_INF_REPORT)
-            LOG_INF("input_report %u rv: %d  e:%d  c:%d", i, dv, ch_cfg.evt_type, ch_cfg.input_code);
-#endif
         
             if(i == 0) {
                 if(dv>0) {
