@@ -1,15 +1,18 @@
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/donoMondes/
+      url-base: https://github.com/donoMondes
     - name: petejohanson
       url-base: https://github.com/petejohanson
-    # Additional modules containing boards/shields/custom code can be listed here as well
-    # See https://docs.zephyrproject.org/3.2.0/develop/west/manifest.html#projects
+    - name: joystick-keybinds
+      url-base: https://github.com/letmegobacktosleep
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: adc-enable
       import: app/west.yml
+    - name: zmk-keyboard-joystick-wasd
+      remote: joystick-keybinds
+      revision: main
   self:
     path: config

@@ -13,7 +13,7 @@
             &kp TAB    &kp A &kp S &kp D &kp F &kp G            &kp H &kp J &kp K     &kp L   &kp SEMI &kp RET
             &kp LSHIFT &kp Z &kp X &kp C &kp V &kp B            &kp N &kp M &kp COMMA &kp DOT &kp FSLH &kp RSHFT
             &kp LGUI   &kp LALT          &kp LCTRL &lt 2 SPACE   &lt 1 SPACE                  &mkp LCLK &lt 3 BSLH
-            >;
+            &kp UP &kp LEFT &kp DOWN &kp RIGHT>;
         };
 
         number_layer {
@@ -22,7 +22,7 @@
             &trans      &kp AT  &trans  &trans  &kp UP  &kp LBKT        &kp RBKT  &kp RIGHT  &kp MINUS  &kp EQUAL  &trans  &kp SQT
             &trans      &trans  &kp CARET  &kp PRCNT  &kp AMPS  &kp LPAR        &kp RPAR  &kp STAR  &trans  &trans  &trans  &trans
             &trans      &trans                  &trans  &trans          &trans                          &trans  &trans
-            >;
+            &trans &trans &trans &trans>;
         };
 
         function_layer {
@@ -31,7 +31,7 @@
             &trans      &trans  &trans  &kp HOME  &kp END  &trans       &trans  &kp UP  &kp DOWN  &kp LEFT  &kp RIGHT  &kp F11   
             &trans      &trans  &trans  &trans  &trans  &trans          &trans  &trans  &trans  &trans  &trans  &kp F12
             &trans      &trans                  &trans  &trans          &trans                          &trans  &trans
-            >;
+            &trans &trans &trans &trans>;
         };
 
         bt_layer {
@@ -40,7 +40,7 @@
             &sys_reset  &trans  &trans        &trans       &trans       &trans       &trans        &trans       &trans       &trans      &trans  &sys_reset
             &trans      &trans  &trans        &trans       &trans       &trans       &trans        &trans       &trans       &trans      &trans  &trans
             &trans      &trans                             &trans       &trans       &trans                                              &trans  &trans
-            >;
+            &trans &trans &trans &trans>;
         };
     };
 };

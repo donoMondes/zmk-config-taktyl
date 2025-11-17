@@ -3,7 +3,7 @@
 &default_transform { // Offset of 3 because the left side has 3 columns
     col-offset = <6>;
 };
-&kscan0 {
+&kscankeys {
     col-gpios = <&pro_micro 4 GPIO_ACTIVE_HIGH>,
                 <&pro_micro 5 GPIO_ACTIVE_HIGH>,
                 <&pro_micro 6 GPIO_ACTIVE_HIGH>,
@@ -13,34 +13,21 @@
 };
 
 / {
-	anin0: analog_input_0 {
-		compatible = "zmk,analog-input";
-		sampling-hz = <10>;
-		x-ch {
-			io-channels = <&adc 7>; // <--- see ain-map.png for nRF52840
-			mv-mid = <1460>;
-			mv-min-max = <1000>;
-			mv-deadzone = <400>;
-			scale-multiplier = <1>;
-			scale-divisor = <200>;
-            invert;
-			evt-type = <INPUT_EV_REL>;
-			input-code = <INPUT_REL_X>;
-		
-		};
-		y-ch {
-			io-channels = <&adc 5>; // <--- see ain-map.png for nRF52840
-			mv-mid = <1630>;
-			mv-min-max = <1600>;
-			mv-deadzone = <400>;
-			scale-multiplier = <1>;
-			scale-divisor = <200>;
-			evt-type = <INPUT_EV_REL>;
-			input-code = <INPUT_REL_Y>;
-		
-		};
+	kscanjoystick: kscan_joystick {
+        compatible = "zmk,kscan-joystick";
+        poll-period-ms = <10>;  /* 10Hz */
+        idle-period-ms = <50>; /* 20Hz */
+        angle-overlap = <30>;
+        /* do not use a second threshold with bad quality joysticks */
+        /* thresholds = [0A 78]; */
+        status = "okay";
+        wakeup-source;
+        io-channels = <&adc 7>, <&adc 5>;
+        io-channel-names = "x-axis", "y-axis";
 	};
 };
+
+
 
 &adc {
 	status = "okay";
