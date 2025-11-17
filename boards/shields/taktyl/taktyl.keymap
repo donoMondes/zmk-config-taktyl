@@ -28,8 +28,8 @@
         function_layer {
             bindings = <
             &kp ESC     &kp F1  &kp F2  &kp F3  &kp F4  &kp F5          &kp F6  &kp F7  &kp F8  &kp F9  &kp F10  &kp PSCRN
-            &trans      &trans  &trans  &kp HOME  &kp END  &trans       &trans  &kp UP  &kp DOWN  &kp LEFT  &kp RIGHT  &kp F11   
-            &trans      &trans  &trans  &trans  &trans  &trans          &trans  &trans  &trans  &trans  &trans  &kp F12
+            &trans      &kp AT  &trans  &trans  &trans  &kp LBKT        &kp RBKT  &trans  &kp MINUS  &kp EQUAL  &trans  &kp SQT
+            &trans      &trans  &kp CARET  &kp PRCNT  &kp AMPS  &kp LPAR        &kp RPAR  &kp STAR  &trans  &trans  &trans  &trans
             &trans      &trans                  &trans  &trans          &trans                          &trans  &trans
             >;
         };

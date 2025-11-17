@@ -1,5 +1,6 @@
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <input/processors.dtsi>
 
 / {
     chosen {
@@ -36,6 +37,7 @@
 		compatible = "zmk,input-listener";
         status = "disabled";
 		device = <&trackpad>;	
+        input-processors = <&&zip_xy_scaler 3 2>
     };    
 
     joystick_listener: joystick_listener {
