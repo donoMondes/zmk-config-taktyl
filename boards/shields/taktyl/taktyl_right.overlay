@@ -14,7 +14,7 @@
 
 &kscan2 {
 	status = "okay";
-}
+};
 
 &trackpad {
 	status = "okay"; 
