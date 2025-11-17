@@ -27,13 +27,7 @@
 	};
 };
 
-
-
 &adc {
 	status = "okay";
 };
 
-&joystick_listener {
-    status = "okay";
-    device = <&anin0>;
-};
