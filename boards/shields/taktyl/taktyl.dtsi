@@ -38,7 +38,7 @@
         angle-overlap = <30>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        status = "disabled";
+        status = "okay";
         wakeup-source;
         io-channels = <&adc 7>, <&adc 5>;
         io-channel-names = "x-axis", "y-axis";

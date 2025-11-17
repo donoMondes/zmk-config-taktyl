@@ -12,10 +12,6 @@
                 <&pro_micro 9 GPIO_ACTIVE_HIGH>;
 };
 
-&kscan2 {
-	status = "okay";
-};
-
 &trackpad {
 	status = "okay"; 
 };
