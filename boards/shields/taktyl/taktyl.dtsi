@@ -50,7 +50,6 @@
     zip_keybind_keys: zip_keybind_keys {
         compatible = "zmk,input-processor-keybind";
         #input-processor-cells = <0>;
-        track_remainders;
         bindings = <&kp RIGHT>,
                   <&kp LEFT>,
                   <&kp UP>,
@@ -79,7 +78,6 @@
         two-finger-tap;
 
         scroll;
-        natural-scroll-y;
         natural-scroll-x;
         palm_rejection;
 
