@@ -9,7 +9,7 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: adc-enable
+      revision: main
       import: app/west.yml
     - name: zmk-keyboard-joystick-wasd
       remote: joystick-keybinds
