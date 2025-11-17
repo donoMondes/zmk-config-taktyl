@@ -14,7 +14,7 @@
         matrix {
             kscan = <&kscan1>;
         };
-        direct {
+        direct_two {
             kscan = <&kscan2>;
             row-offset = <4>;
         };
@@ -38,7 +38,7 @@
         angle-overlap = <30>;
         /* do not use a second threshold with bad quality joysticks */
         /* thresholds = [0A 78]; */
-        status = "okay";
+        status = "disabled";
         wakeup-source;
         io-channels = <&adc 7>, <&adc 5>;
         io-channel-names = "x-axis", "y-axis";
@@ -70,7 +70,7 @@
 	status = "okay";
 
 	trackpad: iqs5xx@74 {
-        status = "okay";
+        status = "disabled";
         compatible = "azoteq,iqs5xx";
         reg = <0x74>;
 
