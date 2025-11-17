@@ -32,7 +32,7 @@
     };
 
     
-    trackpad_listener {
+    trackpad_listener: trackpad_listener {
 		compatible = "zmk,input-listener";
         status = "disabled";
 		device = <&trackpad>;	
