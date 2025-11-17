@@ -1,11 +1,11 @@
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/donoMondes/
+      url-base: https://github.com/donoMondes
     - name: petejohanson
       url-base: https://github.com/petejohanson
     - name: process_keybinds
-      url-base: https://github.com/te9no
+      url-base: https://github.com/donoMondes
     - name: badjeff
       url-base: https://github.com/badjeff
     # Additional modules containing boards/shields/custom code can be listed here as well
