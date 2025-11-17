@@ -37,7 +37,7 @@
 			scale-divisor = <200>;
 			evt-type = <INPUT_EV_REL>;
 			input-code = <INPUT_REL_Y>;
-		
+			invert;
 		};
 	};
 };

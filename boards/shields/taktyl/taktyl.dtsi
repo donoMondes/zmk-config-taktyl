@@ -52,15 +52,15 @@
         #input-processor-cells = <0>;
         bindings = <&kp RIGHT>,
                   <&kp LEFT>,
-                  <&kp DOWN>,
-                  <&kp UP>;
+                  <&kp UP>,
+                  <&kp DOWN>;
         tick = <40>;
         wait-ms = <0>;
         tap-ms = <10>;
         mode = <2>;
-        threshold = <10>;
+        //threshold = <10>;
         // max_threshold = <200>
-        max_pending_activations = <1>;
+        //max_pending_activations = <1>;
     };
 };
 
