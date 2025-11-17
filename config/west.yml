@@ -1,7 +1,7 @@
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/zmkfirmware
+      url-base: https://github.com/donoMondes/zmk
     - name: petejohanson
       url-base: https://github.com/petejohanson
     # Additional modules containing boards/shields/custom code can be listed here as well
@@ -9,7 +9,7 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main
+      revision: adc-enable
       import: app/west.yml
   self:
     path: config
