@@ -14,10 +14,6 @@
         matrix {
             kscan = <&kscankeys>;
         };
-        direct {
-            kscan = <&kscanjoystick>;
-            row-offset = <4>;
-        };
     };
 
     kscankeys: kscan_matrix {
