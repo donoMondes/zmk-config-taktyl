@@ -465,7 +465,7 @@ static const struct kscan_driver_api kscan_joystick_api = {
                  "n-directions is less than or equal to zero");                                     \
     BUILD_ASSERT(DT_INST_PROP_OR(n, n_directions, 4) <= 16,                                         \
                  "n-directions is greater than 16");                                                \
-    BUILD_ASSERT(DT_INST_PROP_OR(n, col_offset,0) >= 0,                                              \
+    BUILD_ASSERT(DT_INST_PROP_OR(n, col_offset,6) >= 0,                                              \
                  "col-offset must be equal of greater than0");                                      \
     BUILD_ASSERT(DT_INST_PROP_LEN(n, thresholds) > 0,                                               \
                  "thresholds must have between 1 - 8 members");                                     \
@@ -485,7 +485,7 @@ static const struct kscan_driver_api kscan_joystick_api = {
         .angle_offset   = DT_INST_PROP_OR(n, angle_offset, 0),                                      \
         .angle_overlap  = DT_INST_PROP_OR(n, angle_overlap, 0),                                     \
         .n_directions   = DT_INST_PROP_OR(n, n_directions, 4),                                      \
-        .col_offset     = DT_INST_PROP_OR(n, col_offset, 0),                                      \
+        .col_offset     = DT_INST_PROP_OR(n, col_offset, 6),                                      \
         .hysteris       = DT_INST_PROP_OR(n, hysteris, 5),                                          \
         .thresholds_len = DT_INST_PROP_LEN_OR(n, thresholds, 2),                                    \
         .thresholds     = DT_INST_PROP(n, thresholds),                                              \

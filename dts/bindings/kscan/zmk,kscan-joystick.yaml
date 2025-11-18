@@ -40,7 +40,7 @@ properties:
     description: The number of directions (cols) inferred from the joystick.
   col-offset:
     type: int
-    default: 0
+    default: 6
     description: The number of cols to skip to reach the joystick definition
   thresholds:
     type: uint8-array
