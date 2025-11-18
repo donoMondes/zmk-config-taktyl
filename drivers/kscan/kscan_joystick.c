@@ -277,7 +277,7 @@ static void kscan_joystick_work_handler(struct k_work *work) {
                 // Iterate through each row
                 for (uint8_t row = 0; row < config->thresholds_len; row++) {
                     if (row < data->threshold_state) {
-                        // LOG_DBG("STATE: %d, ROW: %d, COL: %d", data->threshold_state, row, col);
+                        LOG_UNC("STATE: %d, ROW: %d, COL: %d", data->threshold_state, row, col);
                         if (!IS_BIT_SET(data->key_state[row], col)) {
                             data->callback(dev, row, col, true);
                             WRITE_BIT(data->key_state[row], col, 1);
