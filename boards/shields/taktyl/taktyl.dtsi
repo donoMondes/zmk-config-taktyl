@@ -31,13 +31,11 @@
             RC(3,0) RC(3,1)                 RC(3,4) RC(3,5)  RC(3,6)                         RC(3,10) RC(3,11)
         >;
     };
-
     
     trackpad_listener: trackpad_listener {
 		compatible = "zmk,input-listener";
         status = "disabled";
-		device = <&trackpad>;	
-        input-processors = <&zip_xy_scaler 3 2>;
+		device = <&trackpad>;
     };    
 
     joystick_listener: joystick_listener {
