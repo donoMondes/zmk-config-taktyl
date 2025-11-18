@@ -1,0 +1,48 @@
+# Copyright (c) 2020, Pete Johanson
+# SPDX-License-Identifier: MIT
+
+description: Joystick as a directional switch
+
+compatible: "zmk,kscan-joystick"
+
+include: kscan.yaml
+
+properties:
+  io-channels:
+    type: phandle-array
+    required: true
+    description: |
+      ADC channels connected to joystick axes.
+      First channel is for X-axis, second for Y-axis.
+  poll-period-ms:
+    type: int
+    default: 10
+    description: Time between reads in milliseconds when joystick is not in the center.
+  idle-period-ms:
+    type: int
+    default: 100
+    description: Time between reads in milliseconds when joystick is in the center.
+  idle-timeout-ms:
+    type: int
+    default: 300000
+    description: Timeout in milliseconds before the kscan switches to use idle-period-ms.
+  angle-offset:
+    type: int
+    default: 0
+    description: The amount of degrees which the angle will be offset by. Must not be negative.
+  angle-overlap:
+    type: int
+    default: 0
+    description: The amount of degrees which the directions will overlap.
+  n-directions:
+    type: int
+    default: 4
+    description: The number of directions (cols) inferred from the joystick.
+  thresholds:
+    type: uint8-array
+    default: [0x0A]
+    description: The magnitude thresholds (rows) inferred from the joystick.
+  hysteris:
+    type: int
+    default: 5
+    description: The deadzone when a threshold is passed.

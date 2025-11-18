@@ -51,7 +51,7 @@ properties:
   report_rate_active_mode:
     type: int
     description: "report rate for the active mode in ms (refer to the IQS5xx datasheet)"
-    default: 5
+    default: 10
 
   palm_rejection:
     type: boolean
@@ -60,7 +60,7 @@ properties:
   palm_reject_threshold:
     type: int
     description: "Area size for the palm reject activation"
-    default: 50
+    default: 100
 
   palm_reject_timeout:
     type: int
@@ -88,10 +88,10 @@ properties:
       Amount of filtering applied at slow speeds.
       0: Most filtering, smoother, but laggier.
       255: Least filtering, least smooth, more responsive.
-    default: 5
+    default: 10
   
   stationary-threshold:
     type: int
     description: |
       How far a finger must move (in pixels) to not be considered stationary.
-    default: 5
+    default: 3

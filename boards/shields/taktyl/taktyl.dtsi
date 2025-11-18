@@ -85,7 +85,8 @@
         >;
     };
 
-    trackpad_listener {
+    trackpad_listener: trackpad_listener {
+        status = "disabled";
 		compatible = "zmk,input-listener";
 		device = <&trackpad>;	
     };    

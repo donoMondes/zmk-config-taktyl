@@ -4,15 +4,10 @@ manifest:
       url-base: https://github.com/donoMondes
     - name: petejohanson
       url-base: https://github.com/petejohanson
-    - name: joystick-keybinds
-      url-base: https://github.com/letmegobacktosleep
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: main
       import: app/west.yml
-    - name: zmk-keyboard-joystick-wasd
-      remote: joystick-keybinds
-      revision: main
   self:
     path: config
