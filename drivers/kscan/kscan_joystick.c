@@ -96,6 +96,7 @@ struct kscan_joystick_config {
     int16_t angle_offset;
     int16_t angle_overlap;
     uint8_t n_directions;
+    uint8_t col_offset;
     uint8_t hysteris;
     uint8_t thresholds_len;
     uint8_t thresholds[8];
@@ -277,24 +278,24 @@ static void kscan_joystick_work_handler(struct k_work *work) {
                 // Iterate through each row
                 for (uint8_t row = 0; row < config->thresholds_len; row++) {
                     if (row < data->threshold_state) {
-                        LOG_INF("STATE: %d, ROW: %d, COL: %d", data->threshold_state, row, col);
-                        if (!IS_BIT_SET(data->key_state[row], col)) {
-                            data->callback(dev, row, col, true);
-                            WRITE_BIT(data->key_state[row], col, 1);
+                        LOG_INF("STATE: %d, ROW: %d, COL: %d", data->threshold_state, row, (col+config->col_offset));
+                        if (!IS_BIT_SET(data->key_state[row], (col+config->col_offset))) {
+                            data->callback(dev, row, (col+config->col_offset), true);
+                            WRITE_BIT(data->key_state[row], (col+config->col_offset), 1);
                         }
                     } else {
-                        if (IS_BIT_SET(data->key_state[row], col)) {
-                            data->callback(dev, row, col, false);
-                            WRITE_BIT(data->key_state[row], col, 0);
+                        if (IS_BIT_SET(data->key_state[row], (col+config->col_offset))) {
+                            data->callback(dev, row, (col+config->col_offset), false);
+                            WRITE_BIT(data->key_state[row], (col+config->col_offset), 0);
                         }
                     }
                 }
             }
             else {
                 for (uint8_t row = 0; row < config->thresholds_len; row++) {
-                    if (IS_BIT_SET(data->key_state[row], col)) {
-                        data->callback(dev, row, col, false);
-                        WRITE_BIT(data->key_state[row], col, 0);
+                    if (IS_BIT_SET(data->key_state[row], (col+config->col_offset))) {
+                        data->callback(dev, row, (col+config->col_offset), false);
+                        WRITE_BIT(data->key_state[row], (col+config->col_offset), 0);
                     }
                 }
             }
@@ -464,6 +465,8 @@ static const struct kscan_driver_api kscan_joystick_api = {
                  "n-directions is less than or equal to zero");                                     \
     BUILD_ASSERT(DT_INST_PROP_OR(n, n_directions, 4) <= 16,                                         \
                  "n-directions is greater than 16");                                                \
+    BUILD_ASSERT(DT_INST_PROP_OR(n, col_offset,0) >= 0,                                              \
+                 "col-offset must be equal of greater than0");                                      \
     BUILD_ASSERT(DT_INST_PROP_LEN(n, thresholds) > 0,                                               \
                  "thresholds must have between 1 - 8 members");                                     \
     BUILD_ASSERT(DT_INST_PROP_LEN(n, thresholds) <= 8,                                              \
@@ -482,6 +485,7 @@ static const struct kscan_driver_api kscan_joystick_api = {
         .angle_offset   = DT_INST_PROP_OR(n, angle_offset, 0),                                      \
         .angle_overlap  = DT_INST_PROP_OR(n, angle_overlap, 0),                                     \
         .n_directions   = DT_INST_PROP_OR(n, n_directions, 4),                                      \
+        .col_offset     = DT_INST_PROP_OR(n, col_offset, 0),                                      \
         .hysteris       = DT_INST_PROP_OR(n, hysteris, 5),                                          \
         .thresholds_len = DT_INST_PROP_LEN_OR(n, thresholds, 2),                                    \
         .thresholds     = DT_INST_PROP(n, thresholds),                                              \
