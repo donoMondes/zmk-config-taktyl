@@ -95,7 +95,17 @@
 // Hold time + tap time is used as
 // a threshold for the press and
 // hold gesture.
-#define IQS5XX_HOLD_TIME 0x06BD
+// TODO: Make hold time configurable with KConfig.
+#define IQS5XX_TAP_TIME                 0x06B9
+#define IQS5XX_TAP_DISTANCE             0x06BB
+#define IQS5XX_HOLD_TIME                0x06BD
+#define IQS5XX_SWIPE_INIT_TIME          0x06BF
+#define IQS5XX_SWIPE_INIT_DISTANCE      0x06C1
+#define IQS5XX_SWIPE_CONSEC_TIME        0x06C3
+#define IQS5XX_SWIPE_CONSEC_DISTANCE    0x06C5
+#define IQS5XX_SCROLL_INIT_DISTANCE     0x06C8
+#define IQS5XX_ZOOM_INIT_DISTANCE       0x06CB
+#define IQS5XX_ZOOM_CONSEC_DISTANCE     0x06CD
 // TODO: Make hold time configurable with KConfig.
 
 // Mouse button helpers.
