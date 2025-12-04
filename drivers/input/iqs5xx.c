@@ -119,7 +119,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
     }
 
     k_mutex_lock(&iqs5xx_mutex, K_FOREVER);
-    if (!gesture_events.gesture_events_0.scroll) {
+    if (!gesture_events.gesture_events_1.scroll) {
         // Clear accumulators if we're not actively scrolling.
         data->scroll_x_acc = 0;
         data->scroll_y_acc = 0;
@@ -146,7 +146,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
     int16_t rel_x, rel_y;
     if (sys_info.sys_info_1.tp_movement 
-        || gesture_events.gesture_events_0.scroll) {
+        || gesture_events.gesture_events_1.scroll) {
         ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&touch_data,4);
         if (ret < 0) {
             LOG_ERR("Failed to read relative touch data: %d", ret);
@@ -181,7 +181,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
         // Schedule release after 100ms.
         k_work_schedule(&data->button_release_work, K_MSEC(100));
     } 
-    else if (gesture_events.gesture_events_0.scroll) {
+    else if (gesture_events.gesture_events_1.scroll) {
         // TODO: Expose this divisor.
         int16_t scroll_div = 32;
 
