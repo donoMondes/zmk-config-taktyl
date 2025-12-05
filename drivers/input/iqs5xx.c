@@ -216,7 +216,7 @@ static void iqs5xx_work_handler(struct k_work *work) {
     else if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
         if (rel_x != 0 || rel_y != 0) {
             input_report_rel(dev, INPUT_REL_X, rel_x, false, K_FOREVER);
-            input_report_rel(dev, INPUT_REL_Y, rel_y*1.5, true, K_FOREVER);
+            input_report_rel(dev, INPUT_REL_Y, rel_y, true, K_FOREVER);
         }
     }
     k_mutex_unlock(&iqs5xx_mutex);

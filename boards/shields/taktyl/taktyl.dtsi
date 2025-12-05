@@ -83,7 +83,7 @@
         palm_rejection;
 
 		resolution_x = <1920>;
-  		resolution_y = <1080>;
+  		resolution_y = <1200>;
 
         bottom-beta = <5>;
         stationary-threshold = <5>;
