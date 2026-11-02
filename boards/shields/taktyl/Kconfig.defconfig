@@ -20,10 +20,10 @@ config ZMK_TRACKPAD_LOGICAL_Y
 # (le descripteur HID declare des cm avec un exposant -2).
 # TPS65 : ~65 x 49 mm, a mesurer sur ton module.
 config ZMK_TRACKPAD_PHYSICAL_X
-	default 325
+	default 162
 
 config ZMK_TRACKPAD_PHYSICAL_Y
-	default 245
+	default 122
 
 endif # ZMK_TRACKPAD
 
