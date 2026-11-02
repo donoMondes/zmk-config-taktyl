@@ -142,6 +142,17 @@ static void iqs5xx_work_handler(struct k_work *work) {
 
             data->last_x[i] = ((uint16_t)tp->abs_x.h << 8) | tp->abs_x.l;
             data->last_y[i] = ((uint16_t)tp->abs_y.h << 8) | tp->abs_y.l;
+
+                        // DEBUG : plage reellement couverte par le capteur
+            static uint16_t min_x = UINT16_MAX, max_x, min_y = UINT16_MAX, max_y;
+            bool changed = false;
+            if (data->last_x[i] < min_x) { min_x = data->last_x[i]; changed = true; }
+            if (data->last_x[i] > max_x) { max_x = data->last_x[i]; changed = true; }
+            if (data->last_y[i] < min_y) { min_y = data->last_y[i]; changed = true; }
+            if (data->last_y[i] > max_y) { max_y = data->last_y[i]; changed = true; }
+            if (changed) {
+                LOG_INF("plage X %u..%u  Y %u..%u", min_x, max_x, min_y, max_y);
+            }
             active_mask |= BIT(i);
         }
     }

@@ -113,7 +113,7 @@ static void jarrow_handle(const struct jarrow_config *cfg, struct jarrow_data *d
         jarrow_update_axis(cfg, &data->x, evt->value, RIGHT_ARROW, LEFT_ARROW);
         break;
     case INPUT_REL_Y: // == INPUT_ABS_Y
-        jarrow_update_axis(cfg, &data->y, evt->value, UP_ARROW, DOWN_ARROW);
+        jarrow_update_axis(cfg, &data->y, evt->value, DOWN_ARROW, UP_ARROW);
         break;
     default:
         break;
