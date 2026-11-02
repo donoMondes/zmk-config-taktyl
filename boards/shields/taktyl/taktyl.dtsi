@@ -65,7 +65,7 @@
   		resolution_y = <1200>;
 
         /* 8 ms = 125 Hz, minimum demande par Windows pour un PTP. */
-        report_rate_active_mode = <8>;
+        report_rate_active_mode = <6>;
 
         bottom-beta = <5>;
         stationary-threshold = <5>;
