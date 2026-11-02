@@ -79,147 +79,105 @@ static void iqs5xx_button_release_work_handler(struct k_work *work) {
     k_mutex_unlock(&iqs5xx_mutex);
 }
 
+/*
+ * Lecture d'une trame IQS5xx et emission des evenements multi-touch pour le
+ * listener ZMK en mode "trackpad" (Windows Precision Touchpad).
+ *
+ * L'IQS5xx garde chaque doigt dans le meme slot (0..4) tant qu'il est pose :
+ * les slots peuvent etre "troues" (doigt 0 leve, doigt 1 toujours pose). Un
+ * slot est actif si sa force (touch strength) est non nulle. On parcourt donc
+ * les 5 slots au lieu des `nb_fingers` premiers.
+ *
+ * Pour chaque slot emis : SLOT, X, Y, BTN_TOUCH. Seul le tout dernier
+ * evenement de la trame porte sync=true, pour que ZMK envoie UN seul rapport
+ * PTP par trame (Contact Count correct, un seul Scan Time).
+ */
 static void iqs5xx_work_handler(struct k_work *work) {
     struct iqs5xx_data *data = CONTAINER_OF(work, struct iqs5xx_data, work);
     const struct device *dev = data->dev;
     const struct iqs5xx_config *config = dev->config;
-    int ret;
 
     uint16_t addr;
+    int ret;
 
     struct iqs5xx_sys_info sys_info;
-    struct iqs5xx_gesture_data gesture_events;
-    struct iqs5xx_touch touch_data;
-    memset(&sys_info,0,sizeof(struct iqs5xx_sys_info));
-    memset(&gesture_events,0,sizeof(struct iqs5xx_gesture_data));
-    memset(&touch_data,0,sizeof(struct iqs5xx_touch));
+    struct iqs5xx_all_touch_data all_data;
+    memset(&sys_info, 0, sizeof(sys_info));
+    memset(&all_data, 0, sizeof(all_data));
 
     addr = TO_LE(IQS5XX_SYSTEM_INFO_0);
-
-    // Read system info registers.
-    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&sys_info,2);
+    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&sys_info,
+                            sizeof(sys_info));
     if (ret < 0) {
-        LOG_ERR("Failed to read system info 0: %d", ret);
-        iqs5xx_end_comm_window(dev);
+        LOG_ERR("Failed to read sys_info: %d", ret);
+        goto end_comm;
     }
 
-    addr = TO_LE(IQS5XX_GESTURE_EVENTS_0);
-    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&gesture_events,2);
-    if (ret < 0) {
-        LOG_ERR("Failed to read gesture events: %d", ret);
-        iqs5xx_end_comm_window(dev);
-    }
-
-    // Handle reset indication.
     if (sys_info.sys_info_0.show_reset) {
         LOG_INF("Device reset detected");
-        // Acknowledge reset.
         iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONTROL_0, IQS5XX_ACK_RESET);
-        iqs5xx_end_comm_window(dev);
+        goto end_comm;
     }
+
+    addr = TO_LE(IQS5XX_NUM_FINGERS);
+    ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&all_data,
+                            sizeof(all_data));
+    if (ret < 0) {
+        LOG_ERR("Failed to read all touch data: %d", ret);
+        goto end_comm;
+    }
+
+    const uint8_t max_slots = MIN(config->max_touch_number, IQS5XX_INPUT_MAX_TOUCHES);
+    uint8_t active_mask = 0;
+
+    // Paume detectee : on considere tous les doigts comme leves.
+    if (!sys_info.sys_info_1.palm_detect) {
+        for (uint8_t i = 0; i < max_slots; i++) {
+            const struct iqs5xx_abs_touch *tp = &all_data.touch_points[i];
+            uint16_t strength = ((uint16_t)tp->strength.h << 8) | tp->strength.l;
+
+            if (strength == 0) {
+                continue;
+            }
+
+            data->last_x[i] = ((uint16_t)tp->abs_x.h << 8) | tp->abs_x.l;
+            data->last_y[i] = ((uint16_t)tp->abs_y.h << 8) | tp->abs_y.l;
+            active_mask |= BIT(i);
+        }
+    }
+
+    // Doigts poses a la trame precedente et leves maintenant : il faut envoyer
+    // une derniere fois leur position avec Tip Switch = 0, sinon Windows garde
+    // des doigts "fantomes".
+    const uint8_t lifted_mask = data->prev_active_mask & ~active_mask;
+    const uint8_t emit_mask = active_mask | lifted_mask;
+
+    if (emit_mask == 0) {
+        goto end_comm;
+    }
+
+    // Index du dernier slot emis (celui qui portera sync=true).
+    const uint8_t last_slot = 31 - __builtin_clz((uint32_t)emit_mask);
 
     k_mutex_lock(&iqs5xx_mutex, K_FOREVER);
-    if (!gesture_events.gesture_events_1.scroll) {
-        // Clear accumulators if we're not actively scrolling.
-        data->scroll_x_acc = 0;
-        data->scroll_y_acc = 0;
+    for (uint8_t i = 0; i < max_slots; i++) {
+        if (!(emit_mask & BIT(i))) {
+            continue;
+        }
+
+        const bool touching = (active_mask & BIT(i)) != 0;
+
+        input_report_abs(dev, INPUT_ABS_MT_SLOT, i, false, K_FOREVER);
+        input_report_abs(dev, INPUT_ABS_X, data->last_x[i], false, K_FOREVER);
+        input_report_abs(dev, INPUT_ABS_Y, data->last_y[i], false, K_FOREVER);
+        input_report_key(dev, INPUT_BTN_TOUCH, touching ? 1 : 0, i == last_slot, K_FOREVER);
     }
 
-    uint16_t button_code;
-    bool button_pressed = false;
-    if (gesture_events.gesture_events_0.single_tap
-        && (!gesture_events.gesture_events_1.scroll
-        || !gesture_events.gesture_events_1.zoom)) {
-        button_pressed = true;
-        data->tap_in_progress = true;
-        button_code = INPUT_BTN_0;
-    } 
-    else if (gesture_events.gesture_events_1.two_finger_tap
-        && (!gesture_events.gesture_events_1.scroll
-        || !gesture_events.gesture_events_1.zoom)) {
-        button_pressed = true;
-        data->two_finger_tap_in_progress = true;
-        button_code = INPUT_BTN_1;
-    }
-
-    addr = TO_LE(IQS5XX_REL_X);
-
-    int16_t rel_x, rel_y;
-    if (sys_info.sys_info_1.tp_movement 
-        || gesture_events.gesture_events_1.scroll) {
-        ret = i2c_write_read_dt(&config->i2c, &addr, sizeof(addr), (uint8_t *)&touch_data,4);
-        if (ret < 0) {
-            LOG_ERR("Failed to read relative touch data: %d", ret);
-            iqs5xx_end_comm_window(dev);
-        }
-    }
-    rel_x = (int16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(touch_data.rel_x.h, touch_data.rel_x.l);
-    rel_y = (int16_t)AZOTEQ_IQS5XX_COMBINE_H_L_BYTES(touch_data.rel_y.h, touch_data.rel_y.l);
-    // Handle movement and gestures.
-    //
-    // Each one of these branches needs to send the last report it makes as
-    // sync to ensure that the input subsystem processes things in order.
-    if (gesture_events.gesture_events_0.press_and_hold 
-        && !data->active_hold) {
-        LOG_INF("Hold became active");
-        input_report_key(dev, LEFT_BUTTON_CODE, 1, true, K_FOREVER);
-        data->active_hold = true;
-    } 
-    else if (!gesture_events.gesture_events_0.press_and_hold 
-        && data->active_hold) {
-        LOG_INF("Hold became inactive");
-        input_report_key(dev, LEFT_BUTTON_CODE, 0, true, K_FOREVER);
-        data->active_hold = false;
-    } 
-    else if (button_pressed) {
-        // Cancel any pending release.
-        k_work_cancel_delayable(&data->button_release_work);
-
-        // Press the button immediately.
-        input_report_key(dev, button_code, 1, true, K_FOREVER);
-
-        // Schedule release after 100ms.
-        k_work_schedule(&data->button_release_work, K_MSEC(100));
-    } 
-    else if (gesture_events.gesture_events_1.scroll) {
-        // TODO: Expose this divisor.
-        int16_t scroll_div = 32;
-
-        // Only one scrolling direction is valid at a time.
-        // End the communication right after reporting the movement.
-        if (rel_x != 0) {
-            // By default the x axis is already "natural".
-            if (!config->natural_scroll_x) {
-                rel_x *= -1;
-            }
-            data->scroll_x_acc += rel_x;
-            if (abs(data->scroll_x_acc) >= scroll_div) {
-                input_report_rel(dev, INPUT_REL_HWHEEL, data->scroll_x_acc / scroll_div, true,
-                                K_FOREVER);
-                data->scroll_x_acc %= scroll_div;
-            }
-            iqs5xx_end_comm_window(dev);
-        }
-        if (rel_y != 0) {
-            if (config->natural_scroll_y) {
-                rel_y *= -1;
-            }
-            data->scroll_y_acc += rel_y;
-            if (abs(data->scroll_y_acc) >= scroll_div) {
-                input_report_rel(dev, INPUT_REL_WHEEL, data->scroll_y_acc / scroll_div, true,
-                                 K_FOREVER);
-                data->scroll_y_acc %= scroll_div;
-            }
-            iqs5xx_end_comm_window(dev);
-        }
-    } 
-    else if (sys_info.sys_info_1.tp_movement && !sys_info.sys_info_1.palm_detect) {
-        if (rel_x != 0 || rel_y != 0) {
-            input_report_rel(dev, INPUT_REL_X, rel_x, false, K_FOREVER);
-            input_report_rel(dev, INPUT_REL_Y, rel_y, true, K_FOREVER);
-        }
-    }
     k_mutex_unlock(&iqs5xx_mutex);
+
+    data->prev_active_mask = active_mask;
+
+end_comm:
     iqs5xx_end_comm_window(dev);
 }
 
@@ -246,9 +204,16 @@ static int iqs5xx_setup_device(const struct device *dev) {
 
     // Enable event mode and trackpad events.
     ret |= iqs5xx_write_reg8(dev, IQS5XX_SYSTEM_CONFIG_1,
-                            IQS5XX_EVENT_MODE | IQS5XX_TP_EVENT | IQS5XX_GESTURE_EVENT);
+                            IQS5XX_EVENT_MODE | IQS5XX_TP_EVENT | IQS5XX_TOUCH_EVENT);
     if (ret < 0) {
         LOG_ERR("Failed to configure event mode: %d", ret);
+        return ret;
+    }
+
+    // Nombre maximum de doigts suivis (5 pour le PTP).
+    ret = iqs5xx_write_reg8(dev, IQS5XX_MAX_MULTI_TOUCHES, config->max_touch_number);
+    if (ret < 0) {
+        LOG_ERR("Failed to configure maximum number of touch points: %d", ret);
         return ret;
     }
 
@@ -310,7 +275,7 @@ static int iqs5xx_setup_device(const struct device *dev) {
     uint8_t two_finger_gestures = 0;
     two_finger_gestures |= config->two_finger_tap ? IQS5XX_TWO_FINGER_TAP : 0;
     two_finger_gestures |= config->scroll ? IQS5XX_SCROLL : 0;
-    two_finger_gestures |= IQS5XX_ZOOM;
+    // Pas de zoom materiel : en mode PTP, c'est Windows qui reconnait les gestes.
     // Configure multi finger gestures.
     ret = iqs5xx_write_reg8(dev, IQS5XX_MULTI_FINGER_GESTURES_CONF, two_finger_gestures);
     if (ret < 0) {
@@ -461,6 +426,7 @@ static int iqs5xx_init(const struct device *dev) {
         .palm_rejection = DT_INST_PROP(n,palm_rejection),                                          \
         .palm_reject_threshold = DT_INST_PROP_OR(n, palm_reject_threshold, 100),                   \
         .palm_reject_timeout = DT_INST_PROP_OR(n, palm_reject_timeout, 1),                         \
+        .max_touch_number = DT_INST_PROP_OR(n, max_touch_number, 5),                               \
         .resolution_x = DT_INST_PROP_OR(n, resolution_x, 3072),                                    \
         .resolution_y = DT_INST_PROP_OR(n, resolution_y, 2048),                                    \
         .bottom_beta = DT_INST_PROP_OR(n, bottom_beta, 5),                                         \

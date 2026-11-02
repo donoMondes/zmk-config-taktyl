@@ -1,25 +1,18 @@
 manifest:
   remotes:
     - name: zmkfirmware
-      url-base: https://github.com/donoMondes
+      url-base: https://github.com/zmkfirmware
     - name: petejohanson
       url-base: https://github.com/petejohanson
-    - name: process_keybinds
-      url-base: https://github.com/donoMondes
-    - name: badjeff
-      url-base: https://github.com/badjeff
     # Additional modules containing boards/shields/custom code can be listed here as well
     # See https://docs.zephyrproject.org/3.2.0/develop/west/manifest.html#projects
   projects:
+    # Branche de Pete Johanson : support Windows Precision Touchpad (PTP).
+    # Les modules zmk-input-processor-keybind et zmk-analog-input-driver
+    # demandent le ZMK actuel : le driver analogique est embarque dans drivers/input.
     - name: zmk
-      remote: zmkfirmware
-      revision: adc-enable
+      remote: petejohanson
+      revision: feat/pointers-move-scroll-ptp
       import: app/west.yml
-    - name: zmk-input-processor-keybind
-      remote: process_keybinds
-      revision: main
-    - name: zmk-analog-input-driver
-      remote: badjeff
-      revision: main
   self:
     path: config

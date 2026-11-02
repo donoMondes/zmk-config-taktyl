@@ -13,6 +13,10 @@
 
 #define IQS5XX_END_COMM_WINDOW 0xEEEE
 
+// Nombre maximum de doigts suivis par l'IQS5xx.
+#define IQS5XX_MAX_MULTI_TOUCHES 0x066A
+#define IQS5XX_INPUT_MAX_TOUCHES 5
+
 // System Control 0 bits.
 #define IQS5XX_SYSTEM_CONTROL_0 0x0431
 #define IQS5XX_ACK_RESET BIT(7)
@@ -260,6 +264,9 @@ struct iqs5xx_config {
     uint8_t palm_reject_threshold;
     uint8_t palm_reject_timeout;
 
+    // Maximum touch points
+    uint8_t max_touch_number;
+
     // Resolution
     uint16_t resolution_x;
     uint16_t resolution_y;
@@ -285,6 +292,11 @@ struct iqs5xx_data {
     // Scroll accumulators.
     int16_t scroll_x_acc;
     int16_t scroll_y_acc;
+    // Suivi multi-touch (PTP) : slots actifs a la trame precedente
+    // et derniere position connue de chaque slot.
+    uint8_t prev_active_mask;
+    uint16_t last_x[IQS5XX_INPUT_MAX_TOUCHES];
+    uint16_t last_y[IQS5XX_INPUT_MAX_TOUCHES];
 };
 
 struct iqs5xx_xy{
@@ -295,4 +307,20 @@ struct iqs5xx_xy{
 struct iqs5xx_touch {
     struct iqs5xx_xy rel_x; //Touch relative position on the x axis
     struct iqs5xx_xy rel_y; //Touch relative position on the y axis
+} __packed;
+
+// Donnees d'un doigt, telles que lues a partir de IQS5XX_ABS_X (7 octets).
+struct iqs5xx_abs_touch {
+    struct iqs5xx_xy abs_x;    // Position absolue X
+    struct iqs5xx_xy abs_y;    // Position absolue Y
+    struct iqs5xx_xy strength; // Force du contact (0 = slot libre)
+    uint8_t size;              // Surface du contact
+} __packed;
+
+// Bloc lu en une fois a partir de IQS5XX_NUM_FINGERS (1 + 4 + 5 * 7 = 40 octets).
+struct iqs5xx_all_touch_data {
+    uint8_t nb_fingers;
+    struct iqs5xx_xy rel_x;
+    struct iqs5xx_xy rel_y;
+    struct iqs5xx_abs_touch touch_points[IQS5XX_INPUT_MAX_TOUCHES];
 } __packed;
