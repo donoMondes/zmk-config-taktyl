@@ -11,19 +11,19 @@ if ZMK_TRACKPAD
 # Valeurs logiques = resolution programmee dans l'IQS5xx
 # (resolution_x / resolution_y dans taktyl.dtsi).
 config ZMK_TRACKPAD_LOGICAL_X
-	default 1920
+	default 1780
 
 config ZMK_TRACKPAD_LOGICAL_Y
-	default 1200
+	default 770
 
 # Taille physique de la zone active, en 0,1 mm
 # (le descripteur HID declare des cm avec un exposant -2).
 # TPS65 : ~65 x 49 mm, a mesurer sur ton module.
 config ZMK_TRACKPAD_PHYSICAL_X
-	default 162
+	default 650
 
 config ZMK_TRACKPAD_PHYSICAL_Y
-	default 122
+	default 490
 
 endif # ZMK_TRACKPAD
 
