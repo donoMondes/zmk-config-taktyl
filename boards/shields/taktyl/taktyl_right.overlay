@@ -26,6 +26,7 @@
             invert;
 			evt-type = <INPUT_EV_REL>;
 			input-code = <INPUT_REL_X>;
+			report-on-change-only;
 		
 		};
 		y-ch {
@@ -37,6 +38,7 @@
 			scale-divisor = <200>;
 			evt-type = <INPUT_EV_REL>;
 			input-code = <INPUT_REL_Y>;
+			report-on-change-only;
 			invert;
 		};
 	};
@@ -46,9 +48,14 @@
 	status = "okay";
 };
 
-&joystick_listener {
-    status = "okay";
-    device = <&anin0>;
+/* Le joystick ne pilote plus la souris : il envoie les fleches. */
+/ {
+    joystick_arrows {
+        compatible = "zmk,joystick-arrows";
+        device = <&anin0>;
+        threshold = <150>;          /* mV au-dela de la zone morte */
+        release-threshold = <75>;
+    };
 };
 
 &trackpad {

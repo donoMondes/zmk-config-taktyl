@@ -60,3 +60,11 @@ module-str = ANALOG_INPUT
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
 endif #ANALOG_INPUT
+
+config ZMK_JOYSTICK_ARROWS
+    bool "Joystick vers touches flechees"
+    default y
+    depends on INPUT
+    depends on DT_HAS_ZMK_JOYSTICK_ARROWS_ENABLED
+    help
+      Transforme les axes d'un joystick analogique en appuis sur les fleches.

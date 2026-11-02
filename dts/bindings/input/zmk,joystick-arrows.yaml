@@ -1,0 +1,21 @@
+description: |
+  Transforme la deflexion d'un joystick analogique (axes X / Y) en appuis
+  sur les touches flechees gauche / droite / haut / bas.
+
+compatible: "zmk,joystick-arrows"
+
+properties:
+  device:
+    type: phandle
+    required: true
+    description: "Device d'entree a ecouter (ex. le noeud zmk,analog-input)"
+
+  threshold:
+    type: int
+    default: 150
+    description: "Deflexion (en mV hors zone morte) a partir de laquelle la fleche est appuyee"
+
+  release-threshold:
+    type: int
+    default: 75
+    description: "Deflexion en dessous de laquelle la fleche est relachee (doit etre < threshold)"

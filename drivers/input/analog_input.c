@@ -123,7 +123,7 @@ static int analog_input_report_data(const struct device *dev) {
     }
 
     int8_t idx_to_sync = -1;
-    for (uint8_t i = config->io_channels_len - 1; i >= 0; i--) {
+    for (int i = config->io_channels_len - 1; i >= 0; i--) {
         int32_t dv = data->delta[i];
         int32_t pv = data->prev[i];
         if (dv != pv) {
@@ -150,26 +150,11 @@ static int analog_input_report_data(const struct device *dev) {
             LOG_INF("input_report %u rv: %d  e:%d  c:%d", i, dv, ch_cfg.evt_type, ch_cfg.input_code);
 #endif
         
-            if(i == 0) {
-                if(dv>0) {
-                    input_report_key(dev,INPUT_KEY_RIGHT,1,i == idx_to_sync,K_NO_WAIT);
-                    LOG_INF("input_key_right");
-                }
-                else {
-                    input_report_key(dev,INPUT_KEY_LEFT,1,i == idx_to_sync,K_NO_WAIT);
-                    LOG_INF("input_key_left");
-                }
-            }
-            else {
-                if(dv>0) {
-                    input_report_key(dev,INPUT_KEY_UP,1,i == idx_to_sync,K_NO_WAIT);
-                    LOG_INF("input_key_up");
-                }
-                else {
-                    input_report_key(dev,INPUT_KEY_DOWN,1,i == idx_to_sync,K_NO_WAIT);
-                    LOG_INF("input_key_down");    
-                }
-            }
+            // Remonte la deflexion de l'axe (mV hors zone morte, apres invert).
+            // Avec report-on-change-only, une valeur 0 est envoyee au retour
+            // au centre : le module joystick_arrows s'en sert pour relacher la touche.
+            input_report(dev, ch_cfg.evt_type, ch_cfg.input_code, dv, i == idx_to_sync,
+                         K_NO_WAIT);
         }
     }
     return 0;
