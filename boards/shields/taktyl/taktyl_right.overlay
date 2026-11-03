@@ -20,7 +20,7 @@
 		 * y-ch (ordre du tampon ADC). Les reglages ci-dessous restent donc
 		 * appliques au meme signal qu'avant. */
 		x-ch {
-			io-channels = <&adc 7>; // <--- see ain-map.png for nRF52840
+			io-channels = <&adc 5>; // <--- see ain-map.png for nRF52840
 			mv-mid = <1460>;
 			mv-min-max = <1000>;
 			/* 400 etait tronque a 144 par l'ancien driver : 150 garde le meme ressenti */
@@ -34,7 +34,7 @@
 		
 		};
 		y-ch {
-			io-channels = <&adc 5>; // <--- see ain-map.png for nRF52840
+			io-channels = <&adc 7>; // <--- see ain-map.png for nRF52840
 			mv-mid = <1630>;
 			mv-min-max = <1600>;
 			mv-deadzone = <150>;
