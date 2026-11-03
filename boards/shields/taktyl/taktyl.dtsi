@@ -67,6 +67,13 @@
         /* 8 ms = 125 Hz, minimum demande par Windows pour un PTP. */
         report_rate_active_mode = <6>;
 
+        /* Basse consommation geree par l'IQS5xx (reveil au toucher) :
+         * sans doigt 16 ms, puis 40 ms apres 20 s, puis 100 ms (LP2). */
+        report_rate_idle_mode = <16>;
+        report_rate_lp1_mode = <40>;
+        report_rate_lp2_mode = <100>;
+        idle_timeout = <20>;
+
         bottom-beta = <5>;
         stationary-threshold = <5>;
 

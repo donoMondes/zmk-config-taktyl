@@ -16,11 +16,15 @@
 	anin0: analog_input_0 {
 		compatible = "zmk,analog-input";
 		sampling-hz = <150>;
+		/* Canaux echanges : l'ancien driver lisait AIN5 pour x-ch et AIN7 pour
+		 * y-ch (ordre du tampon ADC). Les reglages ci-dessous restent donc
+		 * appliques au meme signal qu'avant. */
 		x-ch {
 			io-channels = <&adc 7>; // <--- see ain-map.png for nRF52840
 			mv-mid = <1460>;
 			mv-min-max = <1000>;
-			mv-deadzone = <400>;
+			/* 400 etait tronque a 144 par l'ancien driver : 150 garde le meme ressenti */
+			mv-deadzone = <150>;
 			scale-multiplier = <1>;
 			scale-divisor = <200>;
             invert;
@@ -33,7 +37,7 @@
 			io-channels = <&adc 5>; // <--- see ain-map.png for nRF52840
 			mv-mid = <1630>;
 			mv-min-max = <1600>;
-			mv-deadzone = <400>;
+			mv-deadzone = <150>;
 			scale-multiplier = <1>;
 			scale-divisor = <200>;
 			evt-type = <INPUT_EV_REL>;

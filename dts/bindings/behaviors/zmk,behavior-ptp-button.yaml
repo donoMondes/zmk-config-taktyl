@@ -1,0 +1,7 @@
+description: |
+  Boutons de souris (LCLK, RCLK, MCLK) envoyes dans le rapport Windows
+  Precision Touchpad. A utiliser a la place de &mkp quand le pave est en mode PTP.
+
+compatible: "zmk,behavior-ptp-button"
+
+include: one_param.yaml

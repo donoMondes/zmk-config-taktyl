@@ -1,97 +1,92 @@
+# Proprietes communes du driver Azoteq IQS5xx (mode Windows Precision Touchpad).
 properties:
   rdy-gpios:
     type: phandle-array
-    description: "Data Ready pin for the Azoteq IQS5xx trackpad"
-  
+    required: true
+    description: "Broche RDY (donnees pretes) de l'IQS5xx"
+
   reset-gpios:
     type: phandle-array
-    description: "Reset pin for the Azoteq IQS5xx trackpad"
-
-  one-finger-tap:
-    type: boolean
-    description: "Register single finger tap gestures and report them as a left click"
-
-  press-and-hold:
-    type: boolean
-    description: "Register press and hold gestures and report them as a left click until released"
-  
-  press-and-hold-time:
-    type: int
-    description: "Time in ms (in addition to the tap time) it takes to register a press and hold gesture"
-    default: 200
-
-  two-finger-tap:
-    type: boolean
-    description: "Register two finger tap gestures and report them as a right click"
-  
-  scroll:
-    type: boolean
-    description: "Register and report scroll gestures, both vertical and horizontal scroll is supported"
-
-  natural-scroll-x:
-    type: boolean
-    description: "Whether content should track finger movement when scrolling on the x axis."
-
-  natural-scroll-y:
-    type: boolean
-    description: "Whether content should track finger movement when scrolling on the y axis."
+    description: |
+      Broche reset de l'IQS5xx. Fortement recommandee : elle sert a relancer
+      le capteur en cas d'erreur I2C et au reveil.
 
   switch-xy:
     type: boolean
-    description: "Flip x and y axes"
-  
+    description: "Echange les axes X et Y"
+
   flip-x:
     type: boolean
-    description: "Invert the direction of the x axis"
+    description: "Inverse le sens de l'axe X"
 
   flip-y:
     type: boolean
-    description: "Invert the direction of the y axis"
-
-  report_rate_active_mode:
-    type: int
-    description: "report rate for the active mode in ms (refer to the IQS5xx datasheet)"
-    default: 5
+    description: "Inverse le sens de l'axe Y"
 
   palm_rejection:
     type: boolean
-    description: "Activate the palm reject function"
+    description: "Active le rejet de la paume de l'IQS5xx"
 
   palm_reject_threshold:
     type: int
-    description: "Area size for the palm reject activation"
     default: 100
+    description: "Surface a partir de laquelle un contact est considere comme une paume"
 
   palm_reject_timeout:
     type: int
-    description: "Timeout to deactivate palm reject (multiple of 32 ms)"
-    default : 4
+    default: 4
+    description: "Delai avant de desactiver le rejet de paume (multiple de 32 ms)"
 
   max_touch_number:
     type: int
-    description: "Value between 1 and 5 for the maximum number of finger points"
     default: 5
+    description: "Nombre maximum de doigts suivis (1 a 5)"
 
   resolution_x:
     type: int
-    description: "Resolution value for the x axis"
     default: 3072
+    description: "Resolution de sortie de l'axe X"
 
   resolution_y:
     type: int
-    description: "Resolution value for the y axis"
     default: 2048
+    description: "Resolution de sortie de l'axe Y"
 
   bottom-beta:
     type: int
+    default: 5
     description: |
-      Amount of filtering applied at slow speeds.
-      0: Most filtering, smoother, but laggier.
-      255: Least filtering, least smooth, more responsive.
-    default: 10
-  
+      Filtrage aux faibles vitesses.
+      0 : filtrage maximal (lisse mais plus de latence), 255 : filtrage minimal.
+
   stationary-threshold:
     type: int
+    default: 5
+    description: "Deplacement (en points) en dessous duquel un doigt est considere immobile"
+
+  report_rate_active_mode:
+    type: int
+    default: 8
+    description: "Intervalle de rapport (ms) quand un doigt bouge ou est pose"
+
+  report_rate_idle_mode:
+    type: int
+    default: 16
     description: |
-      How far a finger must move (in pixels) to not be considered stationary.
-    default: 3
+      Intervalle de rapport (ms) sans doigt pose. Fixe le delai maximal de
+      detection du premier toucher.
+
+  report_rate_lp1_mode:
+    type: int
+    default: 40
+    description: "Intervalle de rapport (ms) en basse consommation 1 (apres idle_timeout)"
+
+  report_rate_lp2_mode:
+    type: int
+    default: 100
+    description: "Intervalle de rapport (ms) en basse consommation 2 (apres une longue inactivite)"
+
+  idle_timeout:
+    type: int
+    default: 20
+    description: "Secondes sans toucher avant de passer en basse consommation 1 (255 = jamais)"

@@ -9,7 +9,7 @@ menuconfig INPUT_AZOTEQ_IQS5XX
     depends on INPUT
     depends on DT_HAS_AZOTEQ_IQS5XX_ENABLED
     help
-      Enable driver for Azoteq IQS5xx trackpads.
+      Enable driver for Azoteq IQS5xx trackpads (mode Windows Precision Touchpad).
 
 if INPUT_AZOTEQ_IQS5XX
 
@@ -23,43 +23,27 @@ config INPUT_AZOTEQ_IQS5XX_INIT_PRIORITY
 endif # INPUT_AZOTEQ_IQS5XX
 
 menuconfig ANALOG_INPUT
-	bool "ANALOG_INPUT adc sensor"
-  select ADC
-	help
-	  Enable ANALOG_INPUT adc sensor.
+    bool "Entree analogique (joystick) sur ADC"
+    depends on INPUT
+    select ADC
+    help
+      Lit des canaux ADC et emet leur deflexion comme evenements d'entree.
 
 if ANALOG_INPUT
 
 config ANALOG_INPUT_WORKQUEUE_PRIORITY
-    int "Workqueue priority"
+    int "Priorite de la workqueue d'echantillonnage"
     default 10
-    help
-      Priority of thread used by the workqueue
 
 config ANALOG_INPUT_WORKQUEUE_STACK_SIZE
-    int "Workqueue stack size"
+    int "Taille de pile de la workqueue d'echantillonnage"
     default 1024
-    help
-      Stack size of thread used by the workqueue
-
-config ANALOG_INPUT_REPORT_INTERVAL_MIN
-	int "ANALOG_INPUT's default minimum report rate"
-	default 0
-	help
-	  Default minimum report interval in milliseconds.
-		Slow down input reporting for hid queue over the air.
-
-config ANALOG_INPUT_LOG_DBG_RAW
-	bool "ANALOG_INPUT debug log for RAW mV"
-
-config ANALOG_INPUT_LOG_DBG_REPORT
-	bool "ANALOG_INPUT debug log for REPORT value"
 
 module = ANALOG_INPUT
 module-str = ANALOG_INPUT
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
 
-endif #ANALOG_INPUT
+endif # ANALOG_INPUT
 
 config ZMK_JOYSTICK_ARROWS
     bool "Joystick vers touches flechees"
@@ -68,3 +52,17 @@ config ZMK_JOYSTICK_ARROWS
     depends on DT_HAS_ZMK_JOYSTICK_ARROWS_ENABLED
     help
       Transforme les axes d'un joystick analogique en appuis sur les fleches.
+
+config ZMK_INPUT_ACTIVITY
+    bool "Les evenements d'entree comptent comme activite ZMK"
+    default y
+    depends on INPUT
+    help
+      Empeche la mise en veille profonde pendant l'utilisation du pave tactile
+      ou du joystick.
+
+config ZMK_BEHAVIOR_PTP_BUTTON
+    bool "Behavior &ptp_btn : clics dans le rapport Precision Touchpad"
+    default y
+    depends on ZMK_TRACKPAD
+    depends on DT_HAS_ZMK_BEHAVIOR_PTP_BUTTON_ENABLED
